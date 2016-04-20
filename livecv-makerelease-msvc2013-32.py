@@ -6,7 +6,7 @@ import scriptcommon
 from subprocess import Popen
 
 SOURCE_DIR  = scriptcommon.OSOperations.scriptdir() + '/..'
-RELEASE_DIR = scriptcommon.OSOperations.scriptdir() + '/../build/build-msvc2013-64'
+RELEASE_DIR = scriptcommon.OSOperations.scriptdir() + '/../build/build-msvc2013-32'
 
 v = scriptcommon.Version(
     '../application/src/qlivecv.h',
@@ -16,7 +16,7 @@ v = scriptcommon.Version(
 
 print('Creating live cv release: version ' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch))
 
-buildname   = 'livecv-' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch) + '-msvc2013-x64'
+buildname   = 'livecv-' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch) + '-msvc2013-x86'
 releasepath = RELEASE_DIR + '/../' + buildname + '/'
 
 if os.path.isdir(releasepath):
@@ -26,7 +26,7 @@ os.makedirs(releasepath)
 print('Copying required files...')
 
 scriptcommon.OSOperations.copyFileStructure(releasepath, {
-    os.path.join(os.environ['QT_DIR'], 'msvc2013_64/bin') : {
+    os.path.join(os.environ['QT_DIR'], 'msvc2013/bin') : {
 		'd3dcompiler_47.dll': '-',
         'icudt*.dll': '-',
         'icuin*.dll': '-',
@@ -42,10 +42,10 @@ scriptcommon.OSOperations.copyFileStructure(releasepath, {
 		'Qt*Widgets.dll': '-',
 		'Qt*WinExtras.dll': '-'
     },
-	os.path.join(os.environ['QT_DIR'], 'msvc2013_64/plugins') : {
+	os.path.join(os.environ['QT_DIR'], 'msvc2013/plugins') : {
 		'platforms/qwindows.dll': 'platforms/qwindows.dll'
 	},
-	os.path.join(os.environ['QT_DIR'], 'msvc2013_64/qml') : {
+	os.path.join(os.environ['QT_DIR'], 'msvc2013/qml') : {
 		'QtQuick' : {
 			'Controls/qtquickcontrolsplugin.dll': 'plugins/QtQuick/Controls/-',
 			'Controls/qmldir': 'plugins/QtQuick/Controls/-',
@@ -69,7 +69,7 @@ scriptcommon.OSOperations.copyFileStructure(releasepath, {
 			'qmldir': 'plugins/QtQuick.2/-'
 		}
 	},
-    os.path.join(os.environ['VS120COMNTOOLS'], '../../VC/redist/x64/Microsoft.VC120.CRT') : {
+    os.path.join(os.environ['VS120COMNTOOLS'], '../../VC/redist/x86/Microsoft.VC120.CRT') : {
         'msvcp120.dll': '-',
         'msvcr120.dll': '-'
     },
