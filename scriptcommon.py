@@ -127,7 +127,7 @@ class Build:
         OSOperations.trace("QMAKE:", proc, end='')
 
     def runmake(self, environment = None):
-        proc = OSOperations.run(["nmake"], self.releasedir, environment)
+        proc = OSOperations.run([self.make], self.releasedir, environment)
         OSOperations.trace("MAKE:", proc, end='')
 
 
