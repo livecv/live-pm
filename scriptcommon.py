@@ -122,8 +122,8 @@ class Build:
             shutil.rmtree(self.releasedir)
         os.makedirs(self.releasedir)
 
-    def createmakefile(self):
-        proc = OSOperations.run([self.qmake, "-recursive", self.sourcedir], self.releasedir)
+    def createmakefile(self, environment = os.environ):
+        proc = OSOperations.run([self.qmake, "-recursive", self.sourcedir], self.releasedir, environment)
         OSOperations.trace("QMAKE:", proc, end='')
 
     def runmake(self, environment = None):
