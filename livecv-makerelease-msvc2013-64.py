@@ -14,6 +14,7 @@ v = scriptcommon.Version(
      '(?:\s*#define LIVECV_VERSION_MINOR)\s*([0-9]*)\s*\n'
      '\s*(?:#define LIVECV_VERSION_PATCH)\s*([0-9]*)\s*')
 
+print('Creating live cv release: version ' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch))
 
 buildname   = 'livecv-' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch) + '-msvc2013-x64'
 releasepath = RELEASE_DIR + '/../' + buildname + '/'
@@ -22,22 +23,52 @@ if os.path.isdir(releasepath):
     shutil.rmtree(releasepath)
 os.makedirs(releasepath)
 
+print('Copying required files...')
 
 scriptcommon.OSOperations.copyFileStructure(releasepath, {
     os.path.join(os.environ['QT_DIR'], 'msvc2013_64/bin') : {
+		'd3dcompiler_47.dll': '-',
         'icudt*.dll': '-',
         'icuin*.dll': '-',
         'icuuc*.dll': '-',
-		'libmysql.dll': '-',
+		'libEGL.dll': '-',
+		'libGLESv2.dll': '-',
         'Qt*Core.dll': '-',
-		'Qt*Sql.dll': '-',
 		'Qt*Network.dll': '-',
+		'Qt*Qml.dll': '-',
+		'Qt*Quick.dll': '-',
+		'Qt*Script.dll': '-',
 		'Qt*Gui.dll': '-',
 		'Qt*Widgets.dll': '-',
-		'libEGL.dll': '-',
-		'libGLESv2.dll' : '-',
+		'Qt*WinExtras.dll': '-'
     },
-	os.path.join(os.environ['QT_DIR'], 'msvc2013_64/plugins/sqldrivers/qsqlmysql.dll'): 'sqldrivers/qsqlmysql.dll',
+	os.path.join(os.environ['QT_DIR'], 'msvc2013_64/plugins') : {
+		'platforms/qwindows.dll': 'platforms/qwindows.dll'
+	},
+	os.path.join(os.environ['QT_DIR'], 'msvc2013_64/qml') : {
+		'QtQuick' : {
+			'Controls/qtquickcontrolsplugin.dll': 'plugins/QtQuick/Controls/-',
+			'Controls/qmldir': 'plugins/QtQuick/Controls/-',
+			'Dialogs/dialogplugin.dll' : 'plugins/QtQuick/Dialogs/-',
+			'Dialogs/qmldir': 'plugins/QtQuick/Dialogs/-',
+			'Layouts/qquicklayoutsplugin.dll': 'plugins/QtQuick/Layouts/-',
+			'Layouts/qmldir': 'plugins/QtQuick/Layouts/-',
+			'LocalStorage/qmllocalstorageplugin.dll': 'plugins/QtQuick/LocalStorage/-',
+			'LocalStorage/qmldir': 'plugins/QtQuick/LocalStorage/-',
+			'Particles.2/particlesplugin.dll': 'plugins/QtQuick/Particles.2/-',
+			'Particles.2/qmldir': 'plugins/QtQuick/Particles.2/-',
+			'PrivateWidgets/widgetsplugin.dll': 'plugins/QtQuick/PrivateWidgets/-',
+			'PrivateWidgets/qmldir': 'plugins/QtQuick/PrivateWidgets/-',
+			'Window.2/windowplugin.dll': 'plugins/QtQuick/Window.2/-',
+			'Window.2/qmldir': 'plugins/QtQuick/Window.2/-',
+			'XmlListModel/qmlxmllistmodelplugin.dll': 'plugins/QtQuick/XmlListModel/-',
+			'XmlListModel/qmldir': 'plugins/QtQuick/XmlListModel/-',
+		},
+		'QtQuick.2' : {
+			'qtquick2plugin.dll': 'plugins/QtQuick.2/-',
+			'qmldir': 'plugins/QtQuick.2/-'
+		}
+	},
 	os.path.join(os.environ['OPENCV_DIR'], 'bin') : {
         'opencv_core2410.dll': '-',
         'opencv_imgproc2410.dll': '-',
@@ -47,9 +78,67 @@ scriptcommon.OSOperations.copyFileStructure(releasepath, {
         'msvcp120.dll': '-',
         'msvcr120.dll': '-'
     },
-    scriptcommon.OSOperations.find('livecv.exe', RELEASE_DIR) : '-'
+    scriptcommon.OSOperations.find('livecv.exe', RELEASE_DIR) : '-',
+	scriptcommon.OSOperations.find('lcvlib.dll', RELEASE_DIR) : '-',
+	os.path.dirname(scriptcommon.OSOperations.find('livecv.exe', RELEASE_DIR)) : {
+		'opencv_*.dll': '-',
+		'plugins': {
+			'lcvcontrols': 'plugins/lcvcontrols',
+			'lcvcore/lcvcore.dll': 'plugins/lcvcore/-',
+			'lcvcore/qmldir': 'plugins/lcvcore/-',
+			'lcvimgproc/lcvimgproc.dll': 'plugins/lcvimgproc/-',
+			'lcvimgproc/qmldir': 'plugins/lcvimgproc/-',
+			'lcvvideo/lcvvideo.dll': 'plugins/lcvvideo/-',
+			'lcvvideo/qmldir': 'plugins/lcvvideo/-',
+			'lcvfeatures2d/lcvfeatures2d.dll': 'plugins/lcvfeatures2d/-',
+			'lcvfeatures2d/qmldir': 'plugins/lcvfeatures2d/-'
+		}
+	},
+	scriptcommon.OSOperations.find('qlcvglobal.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmat.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmataccess.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmatdisplay.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmatfilter.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmatnode.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmatshader.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qmatstate.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('qstatecontainer.h', SOURCE_DIR) : 'api/include/-',
+	scriptcommon.OSOperations.find('lcvlib.lib', SOURCE_DIR) : 'api/lib/-',
+	
+	os.path.join(SOURCE_DIR, 'samples') : '-'
+	
 })
 
+print('Creating include files...')
+
+def generateInclude(location, file, generated):
+	hppf = open(os.path.join(location, generated), 'w')
+	hppf.write('#include "' + file + '"\n')
+	hppf.close()
+	print(' * Generated: ' + generated + ' <-- ' + file)
+
+includepath = os.path.join(releasepath, 'api/include')
+generateInclude(includepath, 'qmat.h',            'QMat')
+generateInclude(includepath, 'qmataccess.h',      'QMatAccess')
+generateInclude(includepath, 'qmatdisplay.h',     'QMatDisplay')
+generateInclude(includepath, 'qmatfilter.h',      'QMatFilter')
+generateInclude(includepath, 'qmatnode.h',        'QMatNode')
+generateInclude(includepath, 'qmatshader.h',      'QMatShader')
+generateInclude(includepath, 'qmatstate.h',       'QMatState')
+generateInclude(includepath, 'qstatecontainer.h', 'QStateContainer')
+
+print('Removing junk...')
+
+for subdir, dirs, files in os.walk(releasepath):
+	for file in files:
+		filepath = os.path.join(subdir, file)
+		if ( file == '.gitignore' ):
+			os.remove(filepath)
+			print(' * Removed:' + filepath)
+
+print('Creating archive...')
+			
 shutil.make_archive(releasepath, "zip", RELEASE_DIR + '/../' + buildname)
 
+print(' * Generated: ' + buildname + '.zip')
 
