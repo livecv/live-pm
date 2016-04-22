@@ -5,6 +5,14 @@ import shutil
 import scriptcommon
 from subprocess import Popen
 
+def find_opencv():
+	p = subprocess.Popen(['pkg-config', '--libs-only-L', 'opencv'], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+	out, err = p.communicate()
+	strippedout = out.decode('utf-8').strip()
+	if ( strippedout.startswith('-L') ):
+		return strippedout[2:]
+	return stripepdout
+
 def makerelease_gcc():
 	SOURCE_DIR  = scriptcommon.OSOperations.scriptdir() + '/..'
 	RELEASE_DIR = scriptcommon.OSOperations.scriptdir() + '/../build/build-gcc'
@@ -18,10 +26,10 @@ def makerelease_gcc():
 	print('Creating live cv release: version ' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch))
 
 	buildname   = 'livecv-' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch) + '-gcc-launcher'
-	releasepath = RELEASE_DIR + '/../' + buildname + '/'
+	releasepath = RELEASE_DIR + '/../' + buildname + '/livecv/'
 
-	if os.path.isdir(releasepath):
-		shutil.rmtree(releasepath)
+	if os.path.isdir(RELEASE_DIR + '/../' + buildname):
+		shutil.rmtree(RELEASE_DIR + '/../' + buildname)
 	os.makedirs(releasepath)
 
 	print('Copying required files...')
@@ -42,6 +50,57 @@ def makerelease_gcc():
 				'lcvfeatures2d/liblcvfeatures2d.so': 'plugins/lcvfeatures2d/-',
 				'lcvfeatures2d/qmldir': 'plugins/lcvfeatures2d/-'
 			}
+		},
+		os.path.join(os.environ['QTDIR'], 'lib') : {
+			'libQt5Core.so*': 'lib/-',
+			'libQt5DBus.so*': 'lib/-',
+			'libQt5Gui.so*': 'lib/-',
+			'libQt5OpenGL.so*': 'lib/-',
+			'libQt5Qml.so*': 'lib/-',
+			'libQt5Quick.so*': 'lib/-',
+			'libQt5Script.so*': 'lib/-',
+			'libQt5Widgets.so*': 'lib/-',
+			'libQt5Network.so*': 'lib/-',
+			'libicudata.so*': 'lib/-',
+			'libicui18n.so*': 'lib/-',
+			'libicuio.so*': 'lib/-',
+			'libicule.so*': 'lib/-',
+			'libiculx.so*': 'lib/-',
+			'libicutu.so*': 'lib/-',
+			'libicuuc.so*': 'lib/-'
+		},
+		os.path.join(os.environ['QT_QTDIR'], 'qml') : {
+			'QtQuick' : {
+				'Controls/libqtquickcontrolsplugin.so': 'plugins/QtQuick/Controls/-',
+				'Controls/qmldir': 'plugins/QtQuick/Controls/-',
+				'Dialogs/libdialogplugin.so' : 'plugins/QtQuick/Dialogs/-',
+				'Dialogs/qmldir': 'plugins/QtQuick/Dialogs/-',
+				'Layouts/libqquicklayoutsplugin.so': 'plugins/QtQuick/Layouts/-',
+				'Layouts/qmldir': 'plugins/QtQuick/Layouts/-',
+				'LocalStorage/libqmllocalstorageplugin.so': 'plugins/QtQuick/LocalStorage/-',
+				'LocalStorage/qmldir': 'plugins/QtQuick/LocalStorage/-',
+				'Particles.2/libparticlesplugin.so': 'plugins/QtQuick/Particles.2/-',
+				'Particles.2/qmldir': 'plugins/QtQuick/Particles.2/-',
+				'PrivateWidgets/libwidgetsplugin.so': 'plugins/QtQuick/PrivateWidgets/-',
+				'PrivateWidgets/qmldir': 'plugins/QtQuick/PrivateWidgets/-',
+				'Window.2/libwindowplugin.so': 'plugins/QtQuick/Window.2/-',
+				'Window.2/qmldir': 'plugins/QtQuick/Window.2/-',
+				'XmlListModel/libqmlxmllistmodelplugin.so': 'plugins/QtQuick/XmlListModel/-',
+				'XmlListModel/qmldir': 'plugins/QtQuick/XmlListModel/-',
+			},
+			'QtQuick.2' : {
+				'libqtquick2plugin.so': 'plugins/QtQuick.2/-',
+				'qmldir': 'plugins/QtQuick.2/-'
+			}
+		},
+		find_opencv() : {
+			'opencv_calib3d.so*' : 'lib/-',
+			'opencv_core.so*' : 'lib/-',
+			'opencv_features2d.so*' : 'lib/-',
+			'opencv_flann.so*' : 'lib/-',
+			'opencv_highgui.so*' : 'lib/-',
+			'opencv_imgproc.so*' : 'lib/-',
+			'opencv_video.so*' : 'lib/-'
 		},
 		scriptcommon.OSOperations.find('qlcvglobal.h', SOURCE_DIR) : 'api/include/-',
 		scriptcommon.OSOperations.find('qmat.h', SOURCE_DIR) : 'api/include/-',
@@ -97,7 +156,7 @@ def makerelease_gcc():
 
 	print('Creating archive...')
 				
-	shutil.make_archive(releasepath, "gztar", RELEASE_DIR + '/../' + buildname)
+	shutil.make_archive(RELEASE_DIR + '/../' + buildname, "gztar", RELEASE_DIR + '/../' + buildname)
 
 	print(' * Generated: ' + buildname + '.zip')
 	
