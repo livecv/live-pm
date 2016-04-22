@@ -69,12 +69,22 @@ def makerelease_gcc():
 			'libicutu.so*': 'lib/-',
 			'libicuuc.so*': 'lib/-'
 		},
-		os.path.join(os.environ['QT_QTDIR'], 'qml') : {
+		os.path.join(os.environ['QTDIR'], 'plugins') : {
+			'imageformats' : 'lib/plugins/imageformats',
+			'platforminputcontexts' : 'lib/plugins/platforminputcontexts',
+			'platforms' : 'lib/plugins/platforms',
+			'platformthemes' : 'lib/plugins/platformthemes'
+		},
+		os.path.join(os.environ['QTDIR'], 'qml') : {
 			'QtQuick' : {
 				'Controls/libqtquickcontrolsplugin.so': 'plugins/QtQuick/Controls/-',
 				'Controls/qmldir': 'plugins/QtQuick/Controls/-',
+				'Controls/Private' : 'plugins/QtQuick/Controls/Private',
+				'Controls/Styles' : 'plugins/QtQuick/Controls/Styles',
 				'Dialogs/libdialogplugin.so' : 'plugins/QtQuick/Dialogs/-',
 				'Dialogs/qmldir': 'plugins/QtQuick/Dialogs/-',
+				'Dialogs/Private/libdialogsprivateplugin.so' : 'plugins/QtQuick/Dialogs/Private/-',
+				'Dialogs/Private/qmldir' : 'plugins/QtQuick/Dialogs/Private/-',
 				'Layouts/libqquicklayoutsplugin.so': 'plugins/QtQuick/Layouts/-',
 				'Layouts/qmldir': 'plugins/QtQuick/Layouts/-',
 				'LocalStorage/libqmllocalstorageplugin.so': 'plugins/QtQuick/LocalStorage/-',
@@ -91,16 +101,24 @@ def makerelease_gcc():
 			'QtQuick.2' : {
 				'libqtquick2plugin.so': 'plugins/QtQuick.2/-',
 				'qmldir': 'plugins/QtQuick.2/-'
+			},
+			'Qt' : {
+				'labs/folderlistmodel/libqmlfolderlistmodelplugin.so' : 'plugins/Qt/labs/folderlistmodel/-',
+				'labs/folderlistmodel/qmldir' : 'plugins/Qt/labs/folderlistmodel/-',
+				'labs/settings/libqmlsettingsplugin.so' : 'plugins/Qt/labs/settings/-',
+				'labs/settings/qmldir' : 'plugins/Qt/labs/settings/-',
+				'WebSockets/libdeclarative_qmlwebsockets.so': 'plugins/Qt/WebSockets/-',
+				'WebSockets/qmldir' : 'plugins/Qt/WebSockets/-'
 			}
 		},
 		find_opencv() : {
-			'opencv_calib3d.so*' : 'lib/-',
-			'opencv_core.so*' : 'lib/-',
-			'opencv_features2d.so*' : 'lib/-',
-			'opencv_flann.so*' : 'lib/-',
-			'opencv_highgui.so*' : 'lib/-',
-			'opencv_imgproc.so*' : 'lib/-',
-			'opencv_video.so*' : 'lib/-'
+			'libopencv_calib3d.so*' : 'lib/-',
+			'libopencv_core.so*' : 'lib/-',
+			'libopencv_features2d.so*' : 'lib/-',
+			'libopencv_flann.so*' : 'lib/-',
+			'libopencv_highgui.so*' : 'lib/-',
+			'libopencv_imgproc.so*' : 'lib/-',
+			'libopencv_video.so*' : 'lib/-'
 		},
 		scriptcommon.OSOperations.find('qlcvglobal.h', SOURCE_DIR) : 'api/include/-',
 		scriptcommon.OSOperations.find('qmat.h', SOURCE_DIR) : 'api/include/-',
@@ -139,6 +157,9 @@ def makerelease_gcc():
 	launcherf = open(os.path.join(releasepath, 'launcher.sh'), 'w')
 	launcherf.write('#!/bin/bash\n' + 
 			'export LD_LIBRARY_PATH=`pwd`/lib\n' + 
+			'export QML_IMPORT_PATH=`pwd`/plugins\n' + 
+			'export QML2_IMPORT_PATH=`pwd`/plugins\n' + 
+			'export QT_PLUGIN_PATH=`pwd`/lib/plugins\n' +
 			'export QT_QPA_PLATFORM_PLUGIN_PATH=`pwd`/lib/plugins/platforms\n' + 
 			'./livecv')
 	launcherf.close()
@@ -158,7 +179,7 @@ def makerelease_gcc():
 				
 	shutil.make_archive(RELEASE_DIR + '/../' + buildname, "gztar", RELEASE_DIR + '/../' + buildname)
 
-	print(' * Generated: ' + buildname + '.zip')
+	print(' * Generated: ' + buildname + '.tar.gz')
 	
 
 if __name__ == '__main__':
