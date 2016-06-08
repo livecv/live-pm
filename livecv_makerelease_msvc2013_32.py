@@ -50,8 +50,12 @@ def makerelease_msvc2013_32():
 			'QtQuick' : {
 				'Controls/qtquickcontrolsplugin.dll': 'plugins/QtQuick/Controls/-',
 				'Controls/qmldir': 'plugins/QtQuick/Controls/-',
+                'Controls/Styles/Flat/qtquickextrasflatplugin.dll' : 'plugins/QtQuick/Controls/Styles/Flat/-',
+                'Controls/Styles/Flat/qmldir' : 'plugins/QtQuick/Controls/Styles/Flat/-',
 				'Dialogs/dialogplugin.dll' : 'plugins/QtQuick/Dialogs/-',
 				'Dialogs/qmldir': 'plugins/QtQuick/Dialogs/-',
+                'Dialogs/Private/dialogsprivateplugin.dll' : 'plugins/QtQuick/Dialogs/Private/-',
+                'Dialogs/Private/qmldir' : 'plugins/QtQuick/Dialogs/Private/-',
 				'Layouts/qquicklayoutsplugin.dll': 'plugins/QtQuick/Layouts/-',
 				'Layouts/qmldir': 'plugins/QtQuick/Layouts/-',
 				'LocalStorage/qmllocalstorageplugin.dll': 'plugins/QtQuick/LocalStorage/-',
@@ -68,6 +72,12 @@ def makerelease_msvc2013_32():
 			'QtQuick.2' : {
 				'qtquick2plugin.dll': 'plugins/QtQuick.2/-',
 				'qmldir': 'plugins/QtQuick.2/-'
+			},
+			'Qt/labs' : {
+				'folderlistmodel/qmlfolderlistmodelplugin.dll' : 'plugins/Qt/labs/folderlistmodel/-',
+				'folderlistmodel/qmldir' : 'plugins/Qt/labs/folderlistmodel/-',
+				'settings/qmlsettingsplugin.dll' : 'plugins/Qt/labs/settings/-',
+				'settings/qmldir' : 'plugins/Qt/labs/settings/-'
 			}
 		},
 		os.path.join(os.environ['VS120COMNTOOLS'], '../../VC/redist/x86/Microsoft.VC120.CRT') : {
