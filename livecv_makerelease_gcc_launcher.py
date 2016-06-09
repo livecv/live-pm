@@ -61,6 +61,7 @@ def makerelease_gcc():
 			'libQt5Script.so*': 'lib/-',
 			'libQt5Widgets.so*': 'lib/-',
 			'libQt5Network.so*': 'lib/-',
+			'libQt5XcbQpa.so*': 'lib/-',
 			'libicudata.so*': 'lib/-',
 			'libicui18n.so*': 'lib/-',
 			'libicuio.so*': 'lib/-',
@@ -73,7 +74,8 @@ def makerelease_gcc():
 			'imageformats' : 'lib/plugins/imageformats',
 			'platforminputcontexts' : 'lib/plugins/platforminputcontexts',
 			'platforms' : 'lib/plugins/platforms',
-			'platformthemes' : 'lib/plugins/platformthemes'
+			'platformthemes' : 'lib/plugins/platformthemes',
+			'xcbglintegrations' : 'lib/plugins/xcbglintegrations'
 		},
 		os.path.join(os.environ['QTDIR'], 'qml') : {
 			'QtQuick' : {
@@ -107,18 +109,21 @@ def makerelease_gcc():
 				'labs/folderlistmodel/qmldir' : 'plugins/Qt/labs/folderlistmodel/-',
 				'labs/settings/libqmlsettingsplugin.so' : 'plugins/Qt/labs/settings/-',
 				'labs/settings/qmldir' : 'plugins/Qt/labs/settings/-',
-				'WebSockets/libdeclarative_qmlwebsockets.so': 'plugins/Qt/WebSockets/-',
-				'WebSockets/qmldir' : 'plugins/Qt/WebSockets/-'
+				'WebSockets/qmldir' : 'plugins/Qt/Websockets/-'
+			},
+			'QtWebSockets' : {
+				'libdeclarative_qmlwebsockets.so' : 'plugins/QtWebSockets/-',
+				'qmldir' : 'plugins/QtWebSockets/-'
 			}
 		},
 		find_opencv() : {
-			'libopencv_calib3d.so*' : 'lib/-',
-			'libopencv_core.so*' : 'lib/-',
-			'libopencv_features2d.so*' : 'lib/-',
-			'libopencv_flann.so*' : 'lib/-',
-			'libopencv_highgui.so*' : 'lib/-',
-			'libopencv_imgproc.so*' : 'lib/-',
-			'libopencv_video.so*' : 'lib/-'
+			'libopencv_calib3d.so*' : 'opencv/-',
+			'libopencv_core.so*' : 'opencv/-',
+			'libopencv_features2d.so*' : 'opencv/-',
+			'libopencv_flann.so*' : 'opencv/-',
+			'libopencv_highgui.so*' : 'opencv/-',
+			'libopencv_imgproc.so*' : 'opencv/-',
+			'libopencv_video.so*' : 'opencv/-'
 		},
 		scriptcommon.OSOperations.find('qlcvglobal.h', SOURCE_DIR) : 'api/include/-',
 		scriptcommon.OSOperations.find('qmat.h', SOURCE_DIR) : 'api/include/-',
@@ -156,7 +161,7 @@ def makerelease_gcc():
 
 	launcherf = open(os.path.join(releasepath, 'launcher.sh'), 'w')
 	launcherf.write('#!/bin/bash\n' + 
-			'export LD_LIBRARY_PATH=`pwd`/lib\n' + 
+			'export LD_LIBRARY_PATH=`pwd`/lib:`pwd`/opencv\n' + 
 			'export QML_IMPORT_PATH=`pwd`/plugins\n' + 
 			'export QML2_IMPORT_PATH=`pwd`/plugins\n' + 
 			'export QT_PLUGIN_PATH=`pwd`/lib/plugins\n' +
@@ -164,8 +169,12 @@ def makerelease_gcc():
 			'./livecv')
 	launcherf.close()
 	print(' * Generated launcher.sh')
-
-
+	
+	print('Setting file permissions...')
+	
+	os.chmod(os.path.join(releasepath, 'launcher.sh'), 0o755)
+	os.chmod(os.path.join(releasepath, 'livecv'), 0o755)
+	
 	print('Removing junk...')
 
 	for subdir, dirs, files in os.walk(releasepath):

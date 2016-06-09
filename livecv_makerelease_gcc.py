@@ -18,10 +18,10 @@ def makerelease_gcc():
 	print('Creating live cv release: version ' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch))
 
 	buildname   = 'livecv-' + str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch) + '-gcc'
-	releasepath = RELEASE_DIR + '/../' + buildname + '/'
+	releasepath = RELEASE_DIR + '/../' + buildname + '/livecv/'
 
-	if os.path.isdir(releasepath):
-		shutil.rmtree(releasepath)
+	if os.path.isdir(RELEASE_DIR + '/../' + buildname):
+		shutil.rmtree(RELEASE_DIR + '/../' + buildname)
 	os.makedirs(releasepath)
 
 	print('Copying required files...')
@@ -75,6 +75,10 @@ def makerelease_gcc():
 	generateInclude(includepath, 'qmatstate.h',       'QMatState')
 	generateInclude(includepath, 'qstatecontainer.h', 'QStateContainer')
 
+	print('Setting file permissions...')
+	
+	os.chmod(os.path.join(releasepath, 'livecv'), 0o755)
+
 	print('Removing junk...')
 
 	for subdir, dirs, files in os.walk(releasepath):
@@ -86,9 +90,9 @@ def makerelease_gcc():
 
 	print('Creating archive...')
 				
-	shutil.make_archive(releasepath, "gztar", RELEASE_DIR + '/../' + buildname)
+	shutil.make_archive(RELEASE_DIR + '/../' + buildname, "gztar", RELEASE_DIR + '/../' + buildname)
 
-	print(' * Generated: ' + buildname + '.zip')
+	print(' * Generated: ' + buildname + '.tar.gz')
 	
 
 if __name__ == '__main__':
