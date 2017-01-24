@@ -102,12 +102,14 @@ class OSOperations:
                     dst = dst[0:len(dst) - 1] + os.path.basename(os.path.normpath(src))
                 shutil.copyfile(src, dst)
 
-    def copyFileStructure(releaseDir, structure, structurePrefix = ""):
+    def copyFileStructure(releaseDir, structure, structurePaths, structurePrefix = ""):
         for key, value in structure.items():
+            keywithpath   = key.format(structurePaths)
+            valuewithpath = value.format(structurePaths)
             if isinstance(value, dict):
-                OSOperations.copyFileStructure(releaseDir, value, os.path.join(structurePrefix, key))
+                OSOperations.copyFileStructure(releaseDir, valuewithpath, os.path.join(structurePrefix, keywithpath))
             else:
-                OSOperations.copyFileOrDirectory(os.path.join(structurePrefix, key), releaseDir + value)
+                OSOperations.copyFileOrDirectory(os.path.join(structurePrefix, keywithpath), releaseDir + valuewithpath)
 
 
 class Build:

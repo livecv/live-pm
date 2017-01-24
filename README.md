@@ -1,15 +1,48 @@
 # Live CV Scripts
 
- * livecv-update-license : Updates live cv license to the latest one, and adds license
- to files that don't have it
- * livecv-version-increment-major : Increments version
- * livecv-version-increment-minor : Increments version
- * livecv-version-increment-patch : Increments version
- * livecv-build-msvc2013-32 : builds livecv for win 32
- * livecv-makerelease-msvc2013-32 : creates release for livecv after build
- * livecv-build-msvc2013-64 : builds livecv for win 64
- * livecv-makerelease-msvc2013-64 : creates release for livecv after build
+Scripts used to manage Live CV build and deployment processes.
 
 ## Usage
 
 Copy these scripts to live cv build directory and run.
+
+## Description
+
+### livecv_license_set.py
+
+Sets livecv license on all source files to the latest version. To run, simply
+use it from livecv/build dir. To run it from somewhere else, specify the source
+dir as its first argument:
+
+```
+livecv_license_set.py /path/to/livecv-src
+```
+
+### livecv_version.py
+
+Get or set the livecv version.
+
+To print the version:
+
+```
+livecv_version.py get [<source_dir>]
+```
+
+To set the version
+
+```
+livecv_version.py set <major>.<minor>.<patch> [<source_dir>]
+```
+
+Where source dir is not required if the script is used from livecv/build directory.
+
+
+### livecv_build.py
+
+Build Live CV.
+
+
+
+### livecv_deploy.py
+
+Deploy live cv after the build process
