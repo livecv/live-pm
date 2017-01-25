@@ -4,9 +4,6 @@ import getopt
 import platform
 import scriptcommon
 
-def asssertEnviron():
-    if ( os.environ['OPENCV_DIR'] == '' ):
-        raise Exception("Failed to find OPENCV_DIR environment varialbe")
 
 def build(compiler = None, bits = None, sourcedir = None):
     if ( bits == None ):
@@ -56,7 +53,7 @@ def main(argv):
         osbit = None
         sourcedir = None
 
-        usage = 'Usage: livecv-build.py [-c <compiler> -b <platform:32 or 64> -s <source-dir>]'
+        usage = 'Usage: livecv_build.py [-c <compiler> -b <platform:32 or 64> -s <source-dir>]'
 
         try:
             opts, args = getopt.getopt(argv,"hc:b:s:")

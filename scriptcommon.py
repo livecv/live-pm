@@ -76,7 +76,6 @@ class OSOperations:
 
 
     def copyFileOrDirectory(src, dst):
-
         if os.path.isdir(src):
             if os.path.basename(os.path.normpath(dst)) == "-":
                 dst = dst[0:len(dst) - 1] + os.path.basename(os.path.normpath(src))
@@ -88,6 +87,7 @@ class OSOperations:
 
             srcfilename = os.path.basename(src)
             if "*" in srcfilename or "?" in srcfilename:
+                copiedFiles = 0
                 for file in os.listdir(os.path.dirname(src)):
                     if fnmatch.fnmatch(file, srcfilename):
                         dstfile = dst
@@ -97,6 +97,10 @@ class OSOperations:
                             os.path.join(os.path.dirname(src), file),
                             dstfile
                         )
+                        copiedFiles += 1
+
+                if ( copiedFiles == 0 ):
+                    print('Warning: No files copied for pattern: ' + src)
             else:
                 if os.path.basename(os.path.normpath(dst)) == "-":
                     dst = dst[0:len(dst) - 1] + os.path.basename(os.path.normpath(src))
@@ -104,13 +108,12 @@ class OSOperations:
 
     def copyFileStructure(releaseDir, structure, structurePaths, structurePrefix = ""):
         for key, value in structure.items():
-            keywithpath   = key.format(structurePaths)
-            valuewithpath = value.format(structurePaths)
+            keywithpath   = key.format_map(structurePaths)
             if isinstance(value, dict):
-                OSOperations.copyFileStructure(releaseDir, valuewithpath, os.path.join(structurePrefix, keywithpath))
+                OSOperations.copyFileStructure(releaseDir, value, structurePaths, os.path.join(structurePrefix, keywithpath))
             else:
+                valuewithpath = value.format(structurePaths)
                 OSOperations.copyFileOrDirectory(os.path.join(structurePrefix, keywithpath), releaseDir + valuewithpath)
-
 
 class Build:
     def __init__(self, sourcedir, releasedir, qmake, make):

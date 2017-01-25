@@ -26,7 +26,7 @@ def main(argv):
     if ( len(argv) == 0 ):
         sourcedir = scriptcommon.OSOperations.scriptdir() + '/..'
     elif ( argv[0] == '-h' ):
-        print('livecv-license-set.py [source-dir]')
+        print('Usage: livecv_license-set.py [source-dir]')
     else:
         sourcedir = argv[0]
 
