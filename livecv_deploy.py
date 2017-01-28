@@ -6,6 +6,125 @@ import shutil
 import scriptcommon
 
 deployStructure = {
+    'gcc' : {
+        '{release}/application' : {
+            'livecv' : '-',
+            'liblcveditor.so*' : '-',
+            'libqmljsparser.so*' : '-',
+            'liblcvlib.so*' : '-',
+            'liblcvlib.*' : 'api/lib/-',
+            'plugins' : {
+                'lcvcontrols': 'plugins/lcvcontrols',
+                'lcvcore': 'plugins/lcvcore',
+                'lcvimgproc': 'plugins/lcvimgproc',
+                'lcvvideo': 'plugins/lcvvideo/-',
+                'lcvfeatures2d': 'plugins/lcvfeatures2d',
+                'lcvphoto': 'plugins/lcvphoto'
+            }
+        },
+        '{source}/lib/include' : {
+            'qlcvglobal.h' : 'api/include/-',
+            'qmat.h' : 'api/include/-',
+            'qmataccess.h' : 'api/include/-',
+            'qmatdisplay.h' : 'api/include/-',
+            'qmatfilter.h' : 'api/include/-',
+            'qmatnode.h' : 'api/include/-',
+            'qmatshader.h' : 'api/include/-',
+            'qmatstate.h' : 'api/include/-',
+            'qstatecontainer.h' : 'api/include/-'
+        },
+        '{source}/samples' : '-'
+    },
+    'gcc_standalone' : {
+        '{release}/application' : {
+            'livecv' : '-',
+            'liblcveditor.so*' : '-',
+            'libqmljsparser.so*' : '-',
+            'liblcvlib.so*' : '-',
+            'plugins' : {
+                'lcvcontrols': 'plugins/lcvcontrols',
+                'lcvcore': 'plugins/lcvcore',
+                'lcvimgproc': 'plugins/lcvimgproc',
+                'lcvvideo': 'plugins/lcvvideo/-',
+                'lcvfeatures2d': 'plugins/lcvfeatures2d',
+                'lcvphoto': 'plugins/lcvphoto'
+            },
+        },
+        '{source}/lib/include' : {
+            'qlcvglobal.h' : 'api/include/-',
+            'qmat.h' : 'api/include/-',
+            'qmataccess.h' : 'api/include/-',
+            'qmatdisplay.h' : 'api/include/-',
+            'qmatfilter.h' : 'api/include/-',
+            'qmatnode.h' : 'api/include/-',
+            'qmatshader.h' : 'api/include/-',
+            'qmatstate.h' : 'api/include/-',
+            'qstatecontainer.h' : 'api/include/-'
+        },
+        '{source}/samples' : '-',
+		'{qtbuild}/lib' : {
+			'libQt5Core.so*': 'lib/-',
+			'libQt5DBus.so*': 'lib/-',
+			'libQt5Gui.so*': 'lib/-',
+			'libQt5OpenGL.so*': 'lib/-',
+			'libQt5Qml.so*': 'lib/-',
+			'libQt5Quick.so*': 'lib/-',
+			'libQt5Script.so*': 'lib/-',
+			'libQt5Widgets.so*': 'lib/-',
+			'libQt5Network.so*': 'lib/-',
+        	'libQt5Xml.so*': '-',
+			'libQt5XcbQpa.so*': 'lib/-',
+			'libicudata.so*': 'lib/-',
+			'libicui18n.so*': 'lib/-',
+			'libicuio.so*': 'lib/-',
+			'libicule.so*': 'lib/-',
+			'libiculx.so*': 'lib/-',
+			'libicutu.so*': 'lib/-',
+			'libicuuc.so*': 'lib/-'
+		},
+		'{qtbuild}/plugins' : {
+			'imageformats' : 'lib/plugins/imageformats',
+			'platforminputcontexts' : 'lib/plugins/platforminputcontexts',
+			'platforms' : 'lib/plugins/platforms',
+			'platformthemes' : 'lib/plugins/platformthemes',
+			'xcbglintegrations' : 'lib/plugins/xcbglintegrations'
+		},
+		'{qtbuild}/qml' : {
+			'QtQuick' : {
+				'Controls/libqtquickcontrolsplugin.so': 'plugins/QtQuick/Controls/-',
+				'Controls/qmldir': 'plugins/QtQuick/Controls/-',
+                'Controls/*.qmltypes': 'plugins/QtQuick/Controls/-',
+				'Controls/Private' : 'plugins/QtQuick/Controls/Private',
+				'Controls/Styles' : 'plugins/QtQuick/Controls/Styles',
+				'Dialogs' : 'plugins/QtQuick/Dialogs',
+				'Layouts': 'plugins/QtQuick/Layouts',
+				'LocalStorage': 'plugins/QtQuick/LocalStorage',
+				'Particles.2': 'plugins/QtQuick/Particles.2',
+				'PrivateWidgets': 'plugins/QtQuick/PrivateWidgets',
+				'Window.2': 'plugins/QtQuick/Window.2',
+				'XmlListModel': 'plugins/QtQuick/XmlListModel'
+			},
+			'QtQuick.2' : 'plugins/QtQuick.2',
+            'QtQml' : 'plugins/QtQml',
+			'Qt' : 'plugins/Qt',
+			'QtWebSockets' : 'plugins/-'
+		},
+		'{opencv_dir}' : {
+			'libopencv_calib3d.so*' : '-',
+			'libopencv_core.so*' : '-',
+			'libopencv_features2d.so*' : '-',
+            'libopencv_shape.so*' : '-',
+			'libopencv_flann.so*' : '-',
+			'libopencv_highgui.so*' : '-',
+			'libopencv_imgproc.so*' : '-',
+            'libopencv_imgcodecs.so*' : '-',
+            'libopencv_objdetect.so*' : '-',
+            'libopencv_stitching.so*' : '-',
+            'libopencv_photo.so*' : '-',
+            'libopencv_videoio.so*' : '-',
+			'libopencv_video.so*' : '-'
+		},
+    },
     'msvc2013' : {
         '{qtbuild}/bin' : {
         	'd3dcompiler_47.dll': '-',
@@ -226,7 +345,7 @@ deployStructure = {
 	}
 }
 
-def build(compiler = None, bits = None, sourcedir = None):
+def build(compiler = None, bits = None, sourcedir = None, deployid = None):
     if ( bits == None ):
         bits = '64' if sys.maxsize > 2**32 else 32
     if (compiler is None):
@@ -234,6 +353,8 @@ def build(compiler = None, bits = None, sourcedir = None):
             compiler = 'msvc2013' + ('_64' if bits == '64' else '')
         else:
             compiler = 'gcc' + ('_64' if bits == '64' else '')
+    if ( deployid is None):
+        deployid = compiler
 
     if ( not 'QTDIR' in os.environ ):
         raise Exception("QTDIR environment variable has not been set.")
@@ -266,7 +387,7 @@ def build(compiler = None, bits = None, sourcedir = None):
     versionstring = str(v.versionMajor) + '.' + str(v.versionMinor) + '.' + str(v.versionPatch)
     print('Version: ' + versionstring)
 
-    buildname = 'livecv-' + versionstring + '-' + compiler.replace('_64', '') + ('-x64' if bits == '64' else '-x86')
+    buildname = 'livecv-' + versionstring + '-' + deployid.replace('_64', '').replace('_', '-') + ('-x64' if bits == '64' else '-x86')
     packagedir = releasedir + '/../' + buildname
     packagedirroot = packagedir + '/livecv/'
 
@@ -278,13 +399,13 @@ def build(compiler = None, bits = None, sourcedir = None):
 
     qtbuild = os.path.join(os.environ['QTDIR'], '../' + compiler)
 
-    scriptcommon.OSOperations.copyFileStructure(packagedirroot, deployStructure[compiler], {
+    scriptcommon.OSOperations.copyFileStructure(packagedirroot, deployStructure[deployid], {
         'qtbuild': qtbuild,
         'qtdir': os.environ['QTDIR'],
         'opencv_dir': os.environ['OPENCV_DIR'],
         'source': sourcedir,
         'release': releasedir,
-        'vs120comntools': os.environ['VS120COMNTOOLS']
+        'vs120comntools': os.environ.get('VS120COMNTOOLS', '')
     })
 
     print('Creating include files...')
@@ -305,6 +426,24 @@ def build(compiler = None, bits = None, sourcedir = None):
     generateInclude(includepath, 'qmatstate.h',       'QMatState')
     generateInclude(includepath, 'qstatecontainer.h', 'QStateContainer')
 
+    if ( 'gcc' in compiler ):
+        print('Setting file permissions...')
+        os.chmod(os.path.join(packagedirroot, 'livecv'), 0o755)
+        if ( 'standalone' in deployid ):
+            print('Generating launcher...')
+            launcherf = open(os.path.join(packagedirroot, 'launcher.sh'), 'w')
+            launcherf.write('#!/bin/bash\n' +
+            		'export LD_LIBRARY_PATH=`pwd`/lib:\n' +
+            		'export QML_IMPORT_PATH=`pwd`/plugins\n' +
+            		'export QML2_IMPORT_PATH=`pwd`/plugins\n' +
+            		'export QT_PLUGIN_PATH=`pwd`/lib/plugins\n' +
+            		'export QT_QPA_PLATFORM_PLUGIN_PATH=`pwd`/lib/plugins/platforms\n' +
+            		'./livecv')
+            launcherf.close()
+            os.chmod(os.path.join(packagedirroot, 'launcher.sh'), 0o755)
+            print(' * Generated launcher.sh')
+
+
     print('Removing junk...')
 
     for subdir, dirs, files in os.walk(packagedirroot):
@@ -315,7 +454,10 @@ def build(compiler = None, bits = None, sourcedir = None):
                 print(' * Removed:' + filepath)
 
     print('Creating archive...')
-    shutil.make_archive(packagedirroot, "zip", packagedir)
+    if ( sys.platform.lower().startswith("win") ):
+        shutil.make_archive(packagedirroot, "zip", packagedir)
+    else:
+        shutil.make_archive(packagedirroot, "gztar", packagedirroot)
 
     print(' * Generated: ' + buildname + '.zip')
 
@@ -324,11 +466,12 @@ def main(argv):
         compiler  = None
         osbit     = None
         sourcedir = None
+        deployid  = None
 
-        usage = 'Usage: livecv_deploy.py [-c <compiler> -b <platform:32 or 64> -s <source-dir>]'
+        usage = 'Usage: livecv_deploy.py [-c <compiler> -b <platform:32 or 64> -s <source-dir> -d <deployid>]'
 
         try:
-            opts, args = getopt.getopt(argv,"hc:b:s:")
+            opts, args = getopt.getopt(argv,"hc:b:s:d:")
             for opt, arg in opts:
                 if ( opt == '-h' ):
                     print(usage)
@@ -339,15 +482,17 @@ def main(argv):
                     osbit = arg
                 elif ( opt == '-s'):
                     sourcedir = arg
+                elif ( opt == '-d'):
+                    deployid = arg
 
-            build(compiler, osbit, sourcedir)
+            build(compiler, osbit, sourcedir, deployid)
 
         except getopt.GetoptError:
-            print()
+            print(usage)
             sys.exit(2)
 
     except Exception as err:
-        print("Cannot build project due to the following exception:\n Exception: " + str(err))
+        print("Cannot deploy project due to the following exception:\n Exception: " + str(err))
 
 if __name__ == "__main__":
    main(sys.argv[1:])
