@@ -76,6 +76,7 @@ def main(argv):
 
     except Exception as err:
         print("Cannot build project due to the following exception:\n Exception: " + str(err))
+        sys.exit(1)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
