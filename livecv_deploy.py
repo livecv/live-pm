@@ -17,7 +17,7 @@ deployStructure = {
                 'lcvcontrols': 'plugins/lcvcontrols',
                 'lcvcore': 'plugins/lcvcore',
                 'lcvimgproc': 'plugins/lcvimgproc',
-                'lcvvideo': 'plugins/lcvvideo/-',
+                'lcvvideo': 'plugins/lcvvideo',
                 'lcvfeatures2d': 'plugins/lcvfeatures2d',
                 'lcvphoto': 'plugins/lcvphoto'
             }
@@ -45,7 +45,7 @@ deployStructure = {
                 'lcvcontrols': 'plugins/lcvcontrols',
                 'lcvcore': 'plugins/lcvcore',
                 'lcvimgproc': 'plugins/lcvimgproc',
-                'lcvvideo': 'plugins/lcvvideo/-',
+                'lcvvideo': 'plugins/lcvvideo',
                 'lcvfeatures2d': 'plugins/lcvfeatures2d',
                 'lcvphoto': 'plugins/lcvphoto'
             },
@@ -397,7 +397,7 @@ def build(compiler = None, bits = None, sourcedir = None, deployid = None):
 
     print('Copying required files...')
 
-    qtbuild = os.path.join(os.environ['QTDIR'], '../' + compiler)
+    qtbuild = os.path.join(os.environ['QTDIR'])
 
     scriptcommon.OSOperations.copyFileStructure(packagedirroot, deployStructure[deployid], {
         'qtbuild': qtbuild,
@@ -458,7 +458,7 @@ def build(compiler = None, bits = None, sourcedir = None, deployid = None):
         shutil.make_archive(packagedirroot + '/..', "zip", packagedir)
         print(' * Generated: ' + buildname + '.zip')
     else:
-        shutil.make_archive(packagedirroot, "gztar", packagedirroot)
+        shutil.make_archive(packagedirroot + '/..', "gztar", packagedirroot)
         print(' * Generated: ' + buildname + '.tar.gz')
 
 
