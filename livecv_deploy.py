@@ -456,10 +456,10 @@ def build(compiler = None, bits = None, sourcedir = None, deployid = None):
     print('Creating archive...')
     if ( sys.platform.lower().startswith("win") ):
         shutil.make_archive(packagedirroot + '/..', "zip", packagedir)
-    	print(' * Generated: ' + buildname + '.zip')
+        print(' * Generated: ' + buildname + '.zip')
     else:
         shutil.make_archive(packagedirroot, "gztar", packagedirroot)
-    	print(' * Generated: ' + buildname + '.tar.gz')
+        print(' * Generated: ' + buildname + '.tar.gz')
 
 
 def main(argv):
