@@ -455,11 +455,12 @@ def build(compiler = None, bits = None, sourcedir = None, deployid = None):
 
     print('Creating archive...')
     if ( sys.platform.lower().startswith("win") ):
-        shutil.make_archive(packagedirroot, "zip", packagedir)
+        shutil.make_archive(packagedirroot + '/..', "zip", packagedir)
+    	print(' * Generated: ' + buildname + '.zip')
     else:
         shutil.make_archive(packagedirroot, "gztar", packagedirroot)
+    	print(' * Generated: ' + buildname + '.tar.gz')
 
-    print(' * Generated: ' + buildname + '.zip')
 
 def main(argv):
     try:
@@ -493,6 +494,7 @@ def main(argv):
 
     except Exception as err:
         print("Cannot deploy project due to the following exception:\n Exception: " + str(err))
+	sys.exit(2)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
