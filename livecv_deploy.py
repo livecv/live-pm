@@ -494,7 +494,7 @@ def main(argv):
 
     except Exception as err:
         print("Cannot deploy project due to the following exception:\n Exception: " + str(err))
-	sys.exit(2)
+        sys.exit(2)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
