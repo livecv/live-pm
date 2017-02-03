@@ -26,7 +26,7 @@ def build(compiler = None, bits = None, sourcedir = None):
 
     releasedir = sourcedir + '/build/' + compiler
 
-    qmake = os.path.join(os.environ['QTDIR'], '../' + compiler + '/bin/qmake' + ('' if 'gcc' in compiler else '.exe'))
+    qmake = os.path.join(os.environ['QTDIR'], 'bin/qmake' + ('' if 'gcc' in compiler else '.exe'))
     make  = 'nmake' if compiler.startswith('msvc') else 'make'
     if ( compiler.startswith('msvc') ):
         if bits == '64':
