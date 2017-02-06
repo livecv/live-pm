@@ -86,7 +86,6 @@ deployStructure = {
 			'imageformats' : 'lib/plugins/imageformats',
 			'platforminputcontexts' : 'lib/plugins/platforminputcontexts',
 			'platforms' : 'lib/plugins/platforms',
-			'platformthemes' : 'lib/plugins/platformthemes',
 			'xcbglintegrations' : 'lib/plugins/xcbglintegrations'
 		},
 		'{qtbuild}/qml' : {
