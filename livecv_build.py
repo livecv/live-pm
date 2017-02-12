@@ -5,7 +5,7 @@ import platform
 import scriptcommon
 
 
-def build(compiler = None, bits = None, sourcedir = None):
+def build(compiler = None, bits = None, sourcedir = None, qmakeargs = None):
     if ( bits == None ):
         bits = '64' if sys.maxsize > 2**32 else 32
     if (compiler is None):
@@ -44,7 +44,7 @@ def build(compiler = None, bits = None, sourcedir = None):
 
     b = scriptcommon.Build(sourcedir, releasedir, qmake, make)
     b.cleandir()
-    b.createmakefile(os.environ)
+    b.createmakefile(os.environ, qmakeargs)
     b.runmake(os.environ)
 
 def main(argv):
@@ -52,11 +52,12 @@ def main(argv):
         compiler = None
         osbit = None
         sourcedir = None
+        qmakeargs = None
 
-        usage = 'Usage: livecv_build.py [-c <compiler> -b <platform:32 or 64> -s <source-dir>]'
+        usage = 'Usage: livecv_build.py [-c <compiler> -b <platform:32 or 64> -s <source-dir> -q <qmake-args>]'
 
         try:
-            opts, args = getopt.getopt(argv,"hc:b:s:")
+            opts, args = getopt.getopt(argv,"hc:b:s:q:")
             for opt, arg in opts:
                 if ( opt == '-h' ):
                     print(usage)
@@ -67,8 +68,10 @@ def main(argv):
                     osbit = arg
                 elif ( opt == '-s'):
                     sourcedir = arg
+                elif ( opt == '-q'):
+                    qmakeargs = arg
 
-            build(compiler, osbit, sourcedir)
+            build(compiler, osbit, sourcedir, qmakeargs)
 
         except getopt.GetoptError:
             print()
