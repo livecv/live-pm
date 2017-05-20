@@ -46,18 +46,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-# SOURCE_DIR_APPLICATION = scriptcommon.OSOperations.scriptdir() + '/../application'
-# SOURCE_DIR_LIB         = scriptcommon.OSOperations.scriptdir() + '/../lib'
-# SOURCE_DIR_PLUGINS     = scriptcommon.OSOperations.scriptdir() + '/../plugins'
-# SOURCE_DIR_TESTS       = scriptcommon.OSOperations.scriptdir() + '/../tests'
-
-#
-# license = scriptcommon.License(SOURCE_DIR_APPLICATION, ['h', 'hpp', 'cpp', 'qml', 'js'])
-# license.update(NEW_LICENSE, OLD_LICENSE)
-# license = scriptcommon.License(SOURCE_DIR_LIB, ['h', 'hpp', 'cpp', 'qml', 'js'])
-# license.update(NEW_LICENSE, OLD_LICENSE)
-# license = scriptcommon.License(SOURCE_DIR_PLUGINS, ['h', 'hpp', 'cpp', 'qml', 'js'])
-# license.update(NEW_LICENSE, OLD_LICENSE)
-# license = scriptcommon.License(SOURCE_DIR_TESTS, ['h', 'hpp', 'cpp', 'qml', 'js'])
-# license.update(NEW_LICENSE, OLD_LICENSE)

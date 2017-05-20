@@ -1,12 +1,53 @@
-# Live CV Scripts
+# Live CV Deployment Scripts
 
-Scripts used to manage Live CV build and deployment processes.
+These are scripts used by Live CV modules to manage source code and create deployment packages.
+
+ * **Version**: 1.4.0
 
 ## Usage
 
-Copy these scripts to live cv build directory and run.
+There are currently 4 available scripts:
+
+ * livecv_build.py
+ * livecv_deploy.py
+ * livecv_license_sync.py
+ * livecv_version_sync.py
+
+All scripts require that live*.json configuration file is available in your repository.
+The file basically describes the available packages within that particular repository and also the requirements to build and deploy those packages.
+
+## Configuring livecv.json
+
+A minimal livecv.json file would contain the following fileds:
+
+```
+{
+  "version" : "0.0.1"
+  "name": "repository_name"
+}
+```
+## Building a livecv plugin
+
+## Deploying a livecv plugin
+
+## Syncing livecv plugin licenses
+
+## Syncing livecv plugin versions
+
+To sync a livecv version with the package file, run the following script:
+
+```
+livecv_version_sync.py [-s <source_dir>] <packagefile>
+```
+
+
+
+
 
 ## Description
+
+### livecv_version_sync.py
+
 
 ### livecv_license_set.py
 
@@ -17,32 +58,3 @@ dir as its first argument:
 ```
 livecv_license_set.py /path/to/livecv-src
 ```
-
-### livecv_version.py
-
-Get or set the livecv version.
-
-To print the version:
-
-```
-livecv_version.py get [<source_dir>]
-```
-
-To set the version
-
-```
-livecv_version.py set <major>.<minor>.<patch> [<source_dir>]
-```
-
-Where source dir is not required if the script is used from livecv/build directory.
-
-
-### livecv_build.py
-
-Build Live CV.
-
-
-
-### livecv_deploy.py
-
-Deploy live cv after the build process

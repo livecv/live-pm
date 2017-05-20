@@ -1,85 +1,101 @@
 import sys
 import os
 import getopt
-import platform
-import scriptcommon
+import json
+import shutil
+from livecv.configuration import *
 
+def build(packagefile, releaseid, sourcedir, builddir, options = {}):
+    releasedir = os.path.join(builddir, releaseid)
 
-def build(compiler = None, bits = None, sourcedir = None, qmakeargs = None):
-    if ( bits == None ):
-        bits = '64' if sys.maxsize > 2**32 else 32
-    if (compiler is None):
-        if ( sys.platform.lower().startswith("win")):
-            compiler = 'msvc2013' + ('_64' if bits == '64' else '')
-        else:
-            compiler = 'gcc' + ('_64' if bits == '64' else '')
+    print('\nParsing build file \'' + packagefile + '\'...')
 
+    with open(packagefile) as jsonfile:
+        packagejson = json.load(jsonfile)
 
-    if ( not 'QTDIR' in os.environ ):
-        raise Exception("QTDIR environment variable has not been set.")
+    config = Configuration(packagejson)
+    if ( not config.has_release(releaseid) ):
+        raise Exception("Failed to find release id:" + releaseid)
 
-    if ( not 'OPENCV_DIR' in os.environ and compiler.startswith('msvc')):
-        raise Exception("OPENCV_DIR environment variable has not been set.")
+    release = config.release(releaseid)
 
-    if (sourcedir == None):
-        sourcedir = scriptcommon.OSOperations.scriptdir() + '/..'
+    print('\nConfiguration found: ' + releaseid)
 
-    releasedir = sourcedir + '/build/' + compiler
+    print('  Modules:')
+    for key, value in config.components.items():
+        print('   * ' + str(value))
 
-    qmake = os.path.join(os.environ['QTDIR'], 'bin/qmake' + ('' if 'gcc' in compiler else '.exe'))
-    make  = 'nmake' if compiler.startswith('msvc') else 'make'
-    if ( compiler.startswith('msvc') ):
-        if bits == '64':
-            scriptcommon.VSEnvironment.setupenv(120, 'x86_amd64')
-        else:
-            scriptcommon.VSEnvironment.setupenv(120, 'x86')
-            os.environ['OPENCV_DIR'] = os.environ['OPENCV_DIR'].replace('\\x64\\', '\\x86\\')
+    print('  Source dir: \'' + sourcedir + '\'')
+    print('  Release dir: \'' + releasedir + '\'')
+    print('  Compiler: \'' + release.compiler + '\'')
+    print('  Environment:')
+    for key, value in release.environment.items():
+        print('   * ' + key + ':\'' + os.environ[key] + '\'')
 
+    print('\nCleaning release dir: \'' + releasedir + '\'')
+    if ( os.path.isdir(releasedir) ):
+        shutil.rmtree(releasedir)
+    os.makedirs(releasedir)
 
-    print('Building Live CV on ' + os.environ['OPENCV_DIR'])
-    print('Compiler: ' + compiler)
-    print('Qmake:' + qmake)
-    print('From: ' + sourcedir)
-    print('To: ' + releasedir)
+    print('\nExecuting build steps:')
 
-    b = scriptcommon.Build(sourcedir, releasedir, qmake, make)
-    b.cleandir()
-    b.createmakefile(os.environ, qmakeargs)
-    b.runmake(os.environ)
+    for value in release.buildsteps:
+        print('\n *** ' + str(value) + ' *** \n')
+        value(sourcedir, releasedir, os.environ)
 
 def main(argv):
-    try:
-        compiler = None
-        osbit = None
-        sourcedir = None
-        qmakeargs = None
+    # try:
+        sourcedir   = None
+        builddir    = None
+        options     = None
 
-        usage = 'Usage: livecv_build.py [-c <compiler> -b <platform:32 or 64> -s <source-dir> -q <qmake-args>]'
+        usage = 'Usage: livecv_build.py [-s <source-dir> -o <options> -b <builddir>] <packagefile> <releaseid>'
+        # try:
+        opts, args = getopt.getopt(argv,"hc:s:o:b")
+        for opt, arg in opts:
+            if ( opt == '-h' ):
+                print(usage)
+                sys.exit()
+            elif ( opt == '-r'):
+                releaseid = arg
+            elif ( opt == '-s'):
+                sourcedir = arg
+            elif ( opt == 'b'):
+                builddir = arg
+            elif ( opt == '-o'):
+                options = arg
 
-        try:
-            opts, args = getopt.getopt(argv,"hc:b:s:q:")
-            for opt, arg in opts:
-                if ( opt == '-h' ):
-                    print(usage)
-                    sys.exit()
-                elif ( opt == '-c'):
-                    compiler = arg
-                elif ( opt == '-b'):
-                    osbit = arg
-                elif ( opt == '-s'):
-                    sourcedir = arg
-                elif ( opt == '-q'):
-                    qmakeargs = arg
-
-            build(compiler, osbit, sourcedir, qmakeargs)
-
-        except getopt.GetoptError:
-            print()
+        if ( len(args) == 0 ):
+            print('No deployment file specified.')
+            print(usage)
+            sys.exit(2)
+        if ( len(args) == 1 ):
+            print('No release id specified.')
+            print(usage)
+            sys.exit(2)
+        if ( len(args) > 2 ):
+            print('Too many arguments specified.')
+            print(usage)
             sys.exit(2)
 
-    except Exception as err:
-        print("Cannot build project due to the following exception:\n Exception: " + str(err))
-        sys.exit(1)
+        packagefile = os.path.abspath(args[0])
+
+        # Fix source path
+        if ( sourcedir == None ):
+            sourcedir = os.path.dirname(packagefile)
+        if ( builddir == None ):
+            builddir = sourcedir + '/build'
+
+        build(args[0], args[1], sourcedir, builddir)
+        print()
+        #
+        # except getopt.GetoptError:
+        #     print()
+        #     sys.exit(2)
+
+    # except Exception as err:
+    #     print("Cannot build project due to the following exception:\n Exception: " + str(err))
+    #     sys.exit(1)
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])
