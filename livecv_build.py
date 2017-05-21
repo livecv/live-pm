@@ -48,8 +48,6 @@ def build(packagefile, releaseid, sourcedir, builddir, options = {}):
         print('\n *** ' + str(value) + ' *** \n')
         value(sourcedir)
 
-    exit(0)
-
     print('\nExecuting build steps:')
 
     for value in release.buildsteps:
