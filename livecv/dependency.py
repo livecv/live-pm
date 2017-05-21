@@ -1,6 +1,5 @@
 from livecv.version import *
 import os
-import git
 
 class Dependency:
     def __init__(self, options):
@@ -12,7 +11,8 @@ class Dependency:
         repodir = os.path.join(sourcedir, 'dependencies/' + self.name)
         if ( not os.path.exists(repodir) ):
             try:
-                git.Git().clone(self.repository, repodir)
+                print()
+#                git.Git().clone(self.repository, repodir)
             except Exception as e:
                 print("Failed to clone repo to \'" + sourcedir + "\': " + str(e))
                 print("Clone the repo manually in order to continue.")
