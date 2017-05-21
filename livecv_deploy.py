@@ -21,8 +21,11 @@ def deploy(packagefile, releaseid, sourcedir, builddir, options = {}):
     for key, value in config.components.items():
         print('   * ' + str(value))
 
-    release = config.release(releaseid)
+    print('  Dependencies:')
+    for value in config.dependencies:
+        print('   * ' + str(value))
 
+    release = config.release(releaseid)
     releasedir = os.path.abspath(os.path.join(builddir, release.compiler))
 
     print('\nConfiguration found: ' + releaseid)

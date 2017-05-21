@@ -27,6 +27,10 @@ def build(packagefile, releaseid, sourcedir, builddir, options = {}):
     for key, value in config.components.items():
         print('   * ' + str(value))
 
+    print('  Dependencies:')
+    for value in config.dependencies:
+        print('   * ' + str(value))
+
     print('  Source dir: \'' + sourcedir + '\'')
     print('  Release dir: \'' + releasedir + '\'')
     print('  Compiler: \'' + release.compiler + '\'')
@@ -38,6 +42,13 @@ def build(packagefile, releaseid, sourcedir, builddir, options = {}):
     if ( os.path.isdir(releasedir) ):
         shutil.rmtree(releasedir)
     os.makedirs(releasedir)
+
+    print('\nSolving dependencies:')
+    for value in config.dependencies:
+        print('\n *** ' + str(value) + ' *** \n')
+        value(sourcedir)
+
+    exit(0)
 
     print('\nExecuting build steps:')
 

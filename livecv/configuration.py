@@ -16,7 +16,7 @@ class Configuration:
         self.dependencies = []
         if ( 'dependencies' in options ):
             for value in options['dependencies']:
-                self.dependencies = Dependency(value)
+                self.dependencies.append(Dependency(value))
 
         for key, value in options['releases'].items():
             self.releases[key] = Release(self.name, self.version, key, value)
