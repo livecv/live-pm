@@ -2,6 +2,7 @@ import glob
 from livecv.release import *
 from livecv.component import *
 from livecv.version import *
+from livecv.dependency import *
 
 class Configuration:
 
@@ -12,6 +13,11 @@ class Configuration:
         self.version = Version(options['version'])
         self.name = options["name"]
         self.releases = {}
+        self.dependencies = []
+        if ( 'dependencies' in options ):
+            for value in options['dependencies']:
+                self.dependencies = Dependency(value)
+
         for key, value in options['releases'].items():
             self.releases[key] = Release(self.name, self.version, key, value)
 

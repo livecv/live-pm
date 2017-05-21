@@ -7,8 +7,6 @@ from livecv.configuration import *
 
 def deploy(packagefile, releaseid, sourcedir, builddir, options = {}):
 
-    packagefile = Configuration.findpackage(packagefile)
-
     print('\nParsing build file \'' + packagefile + '\'...')
 
     with open(packagefile) as jsonfile:
@@ -103,7 +101,7 @@ def main(argv):
             print(usage)
             sys.exit(2)
 
-        packagefile = os.path.abspath(args[0])
+        packagefile = Configuration.findpackage(os.path.abspath(args[0]))
 
         # Fix source path
         if ( sourcedir == None ):
@@ -111,7 +109,7 @@ def main(argv):
         if ( builddir == None ):
             builddir = sourcedir + '/build'
 
-        deploy(args[0], args[1], sourcedir, builddir)
+        deploy(packagefile, args[1], sourcedir, builddir)
         print()
         #
         # except getopt.GetoptError:
