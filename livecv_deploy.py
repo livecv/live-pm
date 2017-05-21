@@ -6,6 +6,9 @@ import shutil
 from livecv.configuration import *
 
 def deploy(packagefile, releaseid, sourcedir, builddir, options = {}):
+
+    packagefile = Configuration.findpackage(packagefile)
+
     print('\nParsing build file \'' + packagefile + '\'...')
 
     with open(packagefile) as jsonfile:

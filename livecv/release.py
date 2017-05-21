@@ -1,25 +1,10 @@
 import os
 import platform
+from livecv.releaseaction import *
+from livecv.releasesolveincludes import *
 from livecv.process import *
 from livecv.filesystem import *
 from livecv.winvsenviron import *
-
-class ReleaseAction:
-    def __init__(self, name, parent, step):
-        self.name = name
-        self.step = step
-        self.parent = parent
-
-    def run_dir(self, releasedir):
-        if ( self.step == 'build' ):
-            return releasedir
-        elif ( self.step == 'deploy' ):
-            deploydir = os.path.abspath(releasedir + '/../' + self.parent.release_name())
-            deploydirroot = os.path.join(deploydir, self.parent.name) + '/'
-            return deploydirroot
-
-    def __str__(self):
-        return self.name
 
 
 class ReleaseMake(ReleaseAction):
@@ -139,7 +124,8 @@ class Release:
             'qmake' : ReleaseQmake,
             'copy' : ReleaseCopy,
             'run' : ReleaseRun,
-            'write' : ReleaseWrite
+            'write' : ReleaseWrite,
+            "solveincludes": ReleaseSolveIncludes
         }
         return actions[type](self, step, options)
 

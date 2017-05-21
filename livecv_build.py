@@ -6,7 +6,8 @@ import shutil
 from livecv.configuration import *
 
 def build(packagefile, releaseid, sourcedir, builddir, options = {}):
-    releasedir = os.path.join(builddir, releaseid)
+
+    packagefile = Configuration.findpackage(packagefile)
 
     print('\nParsing build file \'' + packagefile + '\'...')
 
@@ -18,6 +19,9 @@ def build(packagefile, releaseid, sourcedir, builddir, options = {}):
         raise Exception("Failed to find release id:" + releaseid)
 
     release = config.release(releaseid)
+
+    sourcedir = os.path.abspath(sourcedir)
+    releasedir = os.path.abspath(os.path.join(builddir, release.compiler))
 
     print('\nConfiguration found: ' + releaseid)
 

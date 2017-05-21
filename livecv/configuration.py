@@ -1,3 +1,4 @@
+import glob
 from livecv.release import *
 from livecv.component import *
 from livecv.version import *
@@ -21,3 +22,12 @@ class Configuration:
 
     def release(self, releaseid):
         return self.releases[releaseid]
+
+    def findpackage(path):
+        if ( os.path.isdir(path) ):
+            files = glob.glob(os.path.join(path, 'live*.json'))
+            if len(files) == 0:
+                raise Exception("No file package file found in " + path)
+            return files[0]
+        else:
+            return path

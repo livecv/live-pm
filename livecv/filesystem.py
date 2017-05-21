@@ -32,7 +32,7 @@ class FileSystem:
                         if os.path.basename(os.path.normpath(dst)) == "-":
                             dstfile = dst[0:len(dst) - 1] + file
                         src = os.path.join(os.path.dirname(src), file)
-                        print('Copying: \'' + src + '\' -> \'' + dstfile + '\'')
+                        print('Copying: \'' + src + '\'\n      -> \'' + dstfile + '\'')
                         shutil.copyfile(src, dstfile)
                         copiedFiles += 1
 
@@ -42,7 +42,7 @@ class FileSystem:
                 if os.path.basename(os.path.normpath(dst)) == "-":
                     dst = dst[0:len(dst) - 1] + os.path.basename(os.path.normpath(src))
                 shutil.copyfile(src, dst)
-                print('Copying: \'' + src + '\' -> \'' + dst + '\'')
+                print('Copying: \'' + src + '\'\n      -> \'' + dst + '\'')
 
     def copyFileStructure(releaseDir, structure, structurePaths, structurePrefix = ""):
         for key, value in structure.items():
