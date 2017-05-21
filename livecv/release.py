@@ -92,11 +92,8 @@ class Release:
         self.name = name
         self.version = version
         self.compiler = opt['compiler']
+        self.environmentopt = opt['environment']
         self.environment = {}
-        for key, value in opt['environment'].items():
-            if key not in os.environ:
-                raise Exception("Failed to find key in environment: " + key)
-            self.environment[key] = value
 
         self.buildsteps = []
         for val in opt['build']:
@@ -116,6 +113,12 @@ class Release:
 
     def release_name(self):
         return self.name + '-' + str(self.version) + '-' + self.id.replace('_', '-')
+      
+    def init_environment(self):
+        for key, value in self.environmentopt.items():
+            if key not in os.environ:
+                raise Exception("Failed to find key in environment: " + key)
+            self.environment[key] = value
 
     def create_action(self, step, type, options):
         actions = {

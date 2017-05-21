@@ -34,6 +34,8 @@ def build(packagefile, releaseid, sourcedir, builddir, options = {}):
     print('  Source dir: \'' + sourcedir + '\'')
     print('  Release dir: \'' + releasedir + '\'')
     print('  Compiler: \'' + release.compiler + '\'')
+    
+    release.init_environment()
     print('  Environment:')
     for key, value in release.environment.items():
         print('   * ' + key + ':\'' + os.environ[key] + '\'')
