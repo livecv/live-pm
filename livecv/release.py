@@ -111,9 +111,12 @@ class Release:
             deploystep = self.create_action('deploy', deploytype, val[deploytype])
             self.deploysteps.append(deploystep)
 
+    def dir_name(self):
+        return self.name.replace('.', '-')
+
     def release_name(self):
-        return self.name + '-' + str(self.version) + '-' + self.id.replace('_', '-')
-      
+        return self.dir_name() + '-' + str(self.version) + '-' + self.id.replace('_', '-')
+
     def init_environment(self):
         for key, value in self.environmentopt.items():
             if key not in os.environ:

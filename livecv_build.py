@@ -4,57 +4,13 @@ import getopt
 import json
 import shutil
 from livecv.configuration import *
+from livecv.build import *
 
 def build(packagefile, releaseid, sourcedir, builddir, options = {}):
 
-    print('\nParsing build file \'' + packagefile + '\'...')
+    builder = Build(packagefile, releaseid)
+    builder(sourcedir, os.path.join(builddir, builder.release.compiler), options)
 
-    with open(packagefile) as jsonfile:
-        packagejson = json.load(jsonfile)
-
-    config = Configuration(packagejson)
-    if ( not config.has_release(releaseid) ):
-        raise Exception("Failed to find release id:" + releaseid)
-
-    release = config.release(releaseid)
-
-    sourcedir = os.path.abspath(sourcedir)
-    releasedir = os.path.abspath(os.path.join(builddir, release.compiler))
-
-    print('\nConfiguration found: ' + releaseid)
-
-    print('  Modules:')
-    for key, value in config.components.items():
-        print('   * ' + str(value))
-
-    print('  Dependencies:')
-    for value in config.dependencies:
-        print('   * ' + str(value))
-
-    print('  Source dir: \'' + sourcedir + '\'')
-    print('  Release dir: \'' + releasedir + '\'')
-    print('  Compiler: \'' + release.compiler + '\'')
-    
-    release.init_environment()
-    print('  Environment:')
-    for key, value in release.environment.items():
-        print('   * ' + key + ':\'' + os.environ[key] + '\'')
-
-    print('\nCleaning release dir: \'' + releasedir + '\'')
-    if ( os.path.isdir(releasedir) ):
-        shutil.rmtree(releasedir)
-    os.makedirs(releasedir)
-
-    print('\nSolving dependencies:')
-    for value in config.dependencies:
-        print('\n *** ' + str(value) + ' *** \n')
-        value(sourcedir)
-
-    print('\nExecuting build steps:')
-
-    for value in release.buildsteps:
-        print('\n *** ' + str(value) + ' *** \n')
-        value(sourcedir, releasedir, os.environ)
 
 def main(argv):
     # try:

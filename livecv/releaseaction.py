@@ -11,7 +11,7 @@ class ReleaseAction:
             return releasedir
         elif ( self.step == 'deploy' ):
             deploydir = os.path.abspath(releasedir + '/../' + self.parent.release_name())
-            deploydirroot = os.path.join(deploydir, self.parent.name) + '/'
+            deploydirroot = os.path.join(deploydir, self.parent.dir_name()) + '/'
             return deploydirroot
 
     def __str__(self):

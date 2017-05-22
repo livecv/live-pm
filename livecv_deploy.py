@@ -32,8 +32,8 @@ def deploy(packagefile, releaseid, sourcedir, builddir, options = {}):
     print('  Source dir: \'' + sourcedir + '\'')
     print('  Release dir: \'' + releasedir + '\'')
     print('  Compiler: \'' + release.compiler + '\'')
-    
-    
+
+
     release.init_environment()
     print('  Environment:')
     for key, value in release.environment.items():
@@ -41,7 +41,7 @@ def deploy(packagefile, releaseid, sourcedir, builddir, options = {}):
 
     buildname = release.release_name()
     deploydir = os.path.abspath(releasedir + '/../' + buildname)
-    deploydirroot = deploydir + '/livecv/'
+    deploydirroot = deploydir + '/' + release.name.replace('.', '-') + '/'
 
     print('\nCleaning deploy dir: \'' + deploydir + '\'')
 
