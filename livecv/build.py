@@ -46,18 +46,18 @@ class Build:
             print('   * ' + key + ':\'' + os.environ[key] + '\'')
 
         print('\nCleaning release dir: \'' + builddir + '\'')
-        # if ( os.path.isdir(builddir) ):
-        #     shutil.rmtree(builddir)
-        # os.makedirs(builddir)
+        if ( os.path.isdir(builddir) ):
+            shutil.rmtree(builddir)
+        os.makedirs(builddir)
 
         if ( len(self.config.dependencies) > 0 ):
             print('\nSolving dependencies:')
             for depends in self.config.dependencies:
                 print('\n --------------------- ' + str(depends) + ' --------------------- \n')
                 depends(sourcedir, builddir, self.releaseid)
-                # builder = Build(depends.repodir, self.releaseid)
-                # builder.releasedir = depends.releasedir
-                # builder(depends.repodir, depends.releasedir, options)
+                builder = Build(depends.repodir, self.releaseid)
+                builder.releasedir = depends.releasedir
+                builder(depends.repodir, depends.releasedir, options)
 
                 for value in self.release.buildsteps:
                     if ( value.name == 'qmake' ):
