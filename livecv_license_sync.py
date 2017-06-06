@@ -1,7 +1,8 @@
 import os
 import sys
 import io
-import scriptcommon
+from livecv.license import *
+from livecv.filesystem import *
 
 NEW_LICENSE = str('/****************************************************************************\n'
 			'**\n'
@@ -24,24 +25,28 @@ OLD_LICENSE = '\/\*{20,}.*Copyright\s\(C\)\s2014-2016\sDinu\sSV.*\*{20,}\/'
 
 def main(argv):
     if ( len(argv) == 0 ):
-        sourcedir = scriptcommon.OSOperations.scriptdir() + '/..'
+        sourcedir = FileSystem.scriptdir() + '/..'
     elif ( argv[0] == '-h' ):
         print('Usage: livecv_license-set.py [source-dir]')
     else:
         sourcedir = argv[0]
 
     paths = [
-        'lib',
-        'application',
-        'editor/lcveditor',
+        'application/src',
+        'editor/lcveditor/src',
         'editor/qmljsparser/src',
-        'plugins',
+        'plugins/live/src',
+        'plugins/lcvcore/src',
+        'plugins/lcvfeatures2d/src',
+        'plugins/lcvimgproc/src',
+		'plugins/lcvphoto/src',
+        'plugins/lcvvideo/src',
         'tests'
     ]
 
     for path in paths:
         sourcePath = os.path.join(sourcedir, path)
-        license = scriptcommon.License(sourcePath, ['h', 'hpp', 'cpp', 'qml', 'js'])
+        license = License(sourcePath, ['h', 'hpp', 'cpp', 'qml', 'js'])
         license.update(NEW_LICENSE, OLD_LICENSE)
 
 if __name__ == "__main__":

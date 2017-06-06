@@ -1,4 +1,7 @@
-
+import os
+import sys
+import io
+import re
 
 class License:
 	def __init__(self, sourcedir, extensions):
