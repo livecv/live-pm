@@ -25,9 +25,9 @@ def main(argv):
             print(usage)
             sys.exit(0)
 
-        sourcedir = argv[0]
+        sourcedir = os.path.abspath(argv[0])
         if ( len(argv) == 2 ):
-            releasedir = argv[1]
+            releasedir = os.path.abspath(argv[1])
         else:
             releasedir = os.path.join(sourcedir, 'build')
 
