@@ -1,5 +1,5 @@
-from livecv.version import *
-from livecv.minimalgit import *
+from livepm.lib.version import *
+from livepm.lib.minimalgit import *
 import os
 
 class Dependency:

@@ -1,8 +1,8 @@
 import glob
-from livecv.release import *
-from livecv.component import *
-from livecv.version import *
-from livecv.dependency import *
+from livepm.lib.release import *
+from livepm.lib.component import *
+from livepm.lib.version import *
+from livepm.lib.dependency import *
 
 class Configuration:
 

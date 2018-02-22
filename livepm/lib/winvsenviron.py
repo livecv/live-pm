@@ -1,8 +1,8 @@
 import os
 import platform
 import subprocess
-from livecv.process import *
-from livecv.filesystem import *
+from livepm.lib.process import *
+from livepm.lib.filesystem import *
 
 # Solves visual studio environment for windows builds
 

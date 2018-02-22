@@ -1,6 +1,6 @@
 import os
 import platform
-from livecv.process import *
+from livepm.lib.process import *
 
 class MinimalGit:
 

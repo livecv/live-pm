@@ -1,6 +1,5 @@
 import re
 
-
 class Version:
 
     def __init__(self, versionstring):

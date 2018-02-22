@@ -1,10 +1,11 @@
 import os
 import platform
-from livecv.releaseaction import *
-from livecv.releasesolveincludes import *
-from livecv.process import *
-from livecv.filesystem import *
-from livecv.winvsenviron import *
+
+from livepm.lib.releaseaction import *
+from livepm.lib.releasesolveincludes import *
+from livepm.lib.process import *
+from livepm.lib.filesystem import *
+from livepm.lib.winvsenviron import *
 
 
 class ReleaseMake(ReleaseAction):
@@ -55,6 +56,8 @@ class ReleaseCopy(ReleaseAction):
 
         structurepaths['source']  = sourcedir
         structurepaths['release'] = releasedir
+
+        print('COPY:' + releasedir)
 
         FileSystem.copyFileStructure(self.run_dir(releasedir), self.options, structurepaths)
 

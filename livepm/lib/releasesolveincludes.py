@@ -1,6 +1,6 @@
 import os
 import shutil
-from livecv.releaseaction import *
+from livepm.lib.releaseaction import *
 
 class ReleaseSolveIncludesItem:
     def __init__(self, parent, include, to, source):

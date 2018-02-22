@@ -1,4 +1,4 @@
-from livecv.version import *
+from livepm.lib.version import *
 
 class Component:
     def __init__(self, name, itemob):
