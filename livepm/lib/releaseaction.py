@@ -1,4 +1,5 @@
 import os
+import sys
 
 class ReleaseAction:
     def __init__(self, name, parent, step):
@@ -12,6 +13,10 @@ class ReleaseAction:
         elif ( self.step == 'deploy' ):
             deploydir = os.path.abspath(releasedir + '/../' + self.parent.release_name())
             deploydirroot = os.path.join(deploydir, self.parent.dir_name()) + '/'
+
+            if self.parent.dir_name() == 'livecv' and sys.platform.lower() == 'darwin':
+                deploydirroot = deploydir + '/'
+
             return deploydirroot
 
     def __str__(self):

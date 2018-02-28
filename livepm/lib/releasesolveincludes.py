@@ -26,7 +26,6 @@ class ReleaseSolveIncludesItem:
                 filefound = False
                 for sourcepath in self.source:
                     sourcepath = sourcepath.format_map(paths)
-                    print('LOOKING: ' + filename + ', ' + sourcepath)
                     sourcefile = ReleaseSolveIncludesItem.find(filename, sourcepath)
                     if ( sourcefile is not None ):
                         sourcefilepath = os.path.join(sourcepath, filename)
@@ -58,4 +57,3 @@ class ReleaseSolveIncludes(ReleaseAction):
 
         for item in self.items:
             item(releasedir, structurepaths)
-        # FileSystem.copyFileStructure(self.run_dir(releasedir), self.options, structurepaths)

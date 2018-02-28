@@ -72,9 +72,7 @@ class DeployCommand(Command):
 
         deploydirroot = deploydir + '/' + releasename + '/'
         if releasename == 'livecv' and sys.platform.lower() == 'darwin':
-            print('HERE')
             deploydirroot = deploydir + '/'
-            print(deploydirroot)
 
         print('\nCleaning deploy dir: \'' + deploydir + '\'')
 
@@ -100,6 +98,9 @@ class DeployCommand(Command):
         if ( sys.platform.lower().startswith("win") ):
             shutil.make_archive(deploydirroot + '/..', "zip", deploydir)
             print(' * Generated: ' + buildname + '.zip')
+        elif sys.platform.lower() == 'darwin':
+            shutil.make_archive(deploydirroot, "gztar", deploydirroot)
+            print(' * Generated: ' + buildname + '.tar.gz')
         else:
-            shutil.make_archive(deploydirroot + '/..', "gztar", deploydirroot)
+            shutil.make_archive(deploydirroot, "gztar", deploydirroot)
             print(' * Generated: ' + buildname + '.tar.gz')

@@ -1,10 +1,12 @@
 import os
 import platform
 
-from livepm.lib.releaseaction import *
-from livepm.lib.releasesolveincludes import *
-from livepm.lib.process import *
-from livepm.lib.filesystem import *
+from livepm.lib.releaseaction import ReleaseAction
+from livepm.lib.releasesolveincludes import ReleaseSolveIncludes
+from livepm.lib.releasedylib import ReleaseDylibRelink, ReleaseDylibAddRPath
+from livepm.lib.releaseclean import ReleaseClean
+from livepm.lib.process import Process
+from livepm.lib.filesystem import FileSystem
 from livepm.lib.winvsenviron import *
 
 
@@ -134,7 +136,10 @@ class Release:
             'copy' : ReleaseCopy,
             'run' : ReleaseRun,
             'write' : ReleaseWrite,
-            "solveincludes": ReleaseSolveIncludes
+            'solveincludes': ReleaseSolveIncludes,
+            'dylibrelink': ReleaseDylibRelink,
+            'dylibaddrpath': ReleaseDylibAddRPath,
+            'clean' : ReleaseClean
         }
         return actions[type](self, step, options)
 

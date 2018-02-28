@@ -13,6 +13,23 @@ class FileSystem:
                 return os.path.join(root, name)
         return ''
 
+    def copyfile(src, dst):
+        if os.path.islink(src):
+            linkto = os.readlink(src)
+            os.symlink(linkto, dst)
+        else:
+            shutil.copyfile(src, dst)
+
+    def listEntries(src):
+        entries = []
+        srcfilename = os.path.basename(src)
+        if "*" in srcfilename or "?" in srcfilename:
+            d = os.path.dirname(src)
+            for file in os.listdir(d):
+                if fnmatch.fnmatch(file, srcfilename):
+                    entries.append(os.path.join(d, file))
+        return entries
+
     def copyFileOrDirectory(src, dst):
         if os.path.isdir(src):
             if os.path.basename(os.path.normpath(dst)) == "-":
@@ -33,7 +50,7 @@ class FileSystem:
                             dstfile = dst[0:len(dst) - 1] + file
                         src = os.path.join(os.path.dirname(src), file)
                         print('Copying: \'' + src + '\'\n      -> \'' + dstfile + '\'')
-                        shutil.copyfile(src, dstfile)
+                        FileSystem.copyfile(src, dstfile)
                         copiedFiles += 1
 
                 if ( copiedFiles == 0 ):
@@ -41,7 +58,7 @@ class FileSystem:
             else:
                 if os.path.basename(os.path.normpath(dst)) == "-":
                     dst = dst[0:len(dst) - 1] + os.path.basename(os.path.normpath(src))
-                shutil.copyfile(src, dst)
+                FileSystem.copyfile(src, dst)
                 print('Copying: \'' + src + '\'\n      -> \'' + dst + '\'')
 
     def copyFileStructure(releaseDir, structure, structurePaths, structurePrefix = ""):
