@@ -64,6 +64,7 @@ class Builder:
                         value.options = [
                             "BUILD_DEPENDENCIES=false",
                             "LIVECV_BIN_PATH=\'" + depends.releasedir + "/bin\'",
+                            "LIVECV_DEV_PATH=\'" + sourcedir + "/dependencies/livecv" + "\'",
                             "DEPLOY_PATH=\'" + builddir + "/bin\'"
                         ]
 
