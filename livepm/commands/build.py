@@ -36,4 +36,5 @@ class BuildCommand(Command):
 
     def __call__(self):
         b = Builder(self.package_file, self.release_id)
+        b.deploy_to_livecv = False
         b(self.source_dir, os.path.join(self.build_dir, b.release.compiler), self.options)
