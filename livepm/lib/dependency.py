@@ -9,6 +9,10 @@ class Dependency:
         self.repository = options['repository']
 
     def __call__(self, sourcedir, releasedir, releaseid, options = {}):
+        dependencydir = os.path.join(sourcedir, 'dependencies')
+        if not os.path.exists(dependencydir):
+            os.makedirs(dependencydir)
+
         self.repodir = os.path.join(sourcedir, 'dependencies/' + self.name)
         self.releasedir = os.path.join(releasedir, self.name)
         if ( not os.path.exists(self.repodir) ):

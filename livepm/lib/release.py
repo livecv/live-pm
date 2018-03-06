@@ -29,7 +29,7 @@ class ReleaseNMake(ReleaseAction):
         self.makecommand = 'nmake'
 
     def __call__(self, sourcedir, releasedir, environment = os.environ):
-        VSEnvironment.setupenv(120, 'x86_amd64')
+        VSEnvironment.setupenv(140, 'x86_amd64')
         proc = Process.run([self.makecommand] + self.options, self.run_dir(releasedir), environment)
         Process.trace('MAKE: ', proc, end='')
 

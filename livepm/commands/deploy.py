@@ -78,6 +78,8 @@ class DeployCommand(Command):
 
         if (os.path.isdir(deploydir)):
             shutil.rmtree(deploydir)
+
+        print('Creating deploy dir: \'' + deploydirroot + '\'')
         os.makedirs(deploydirroot)
 
         print('\nExecuting deployment steps:')
