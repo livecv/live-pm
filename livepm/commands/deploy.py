@@ -104,5 +104,5 @@ class DeployCommand(Command):
             shutil.make_archive(deploydirroot, "gztar", deploydirroot)
             print(' * Generated: ' + buildname + '.tar.gz')
         else:
-            shutil.make_archive(deploydirroot, "gztar", deploydirroot)
+            shutil.make_archive(deploydir, "gztar", deploydir)
             print(' * Generated: ' + buildname + '.tar.gz')

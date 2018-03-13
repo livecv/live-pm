@@ -103,6 +103,8 @@ class Builder:
 
                 if dependency_build == 'livecv':
                     self.livecv_bin_path = os.path.join(dependency_release, "bin")
+                    if sys.platform.lower() == 'darwin':
+                        self.livecv_bin_path = os.path.join(self.livecv_bin_path, "livecv.app", "Contents")
                     self.livecv_dev_path = dependency_source
 
         print('\nCreating config file:')
