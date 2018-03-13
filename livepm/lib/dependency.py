@@ -25,3 +25,10 @@ class Dependency:
 
     def __str__(self):
         return str(self.name) + '(' + str(self.version) + ')'
+
+    def to_json(self):
+        return {
+            "name" : self.name,
+            "version" : str(self.version),
+            "repository" : self.repository
+        }

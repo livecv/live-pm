@@ -4,7 +4,7 @@ from livepm.commands.help import HelpCommand
 from livepm.commands.deploy import DeployCommand
 from livepm.commands.license import LicenseCommand
 from livepm.commands.makedoc import MakeDocCommand
-# from livepm.comamnds.new import NewCommand
+from livepm.commands.new import NewCommand
 from livepm.commands.syncversion import SyncVersionCommand
 
 commands_order = [
@@ -12,7 +12,7 @@ commands_order = [
     DeployCommand,
     LicenseCommand,
     MakeDocCommand,
-    # NewCommand,
+    NewCommand,
     SyncVersionCommand,
     HelpCommand
 ]  

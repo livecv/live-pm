@@ -98,6 +98,8 @@ class Release:
         self.version = version
         self.compiler = opt['compiler']
         self.environmentopt = opt['environment']
+        self.buildopt = opt['build']
+        self.deployopt = opt['deploy']
         self.environment = {}
 
         self.buildsteps = []
@@ -143,6 +145,13 @@ class Release:
         }
         return actions[type](self, step, options)
 
+    def to_json(self):
+        return {
+            "compiler" : self.compiler,
+            "environment" : self.environmentopt,
+            "build" : self.buildopt,
+            "deploy" : self.deployopt
+        }
 
 
 # runsample = [

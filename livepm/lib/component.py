@@ -17,3 +17,8 @@ class Component:
 
     def __str__(self):
         return self.name + '(' + str(self.version) + ')'
+
+    def to_json(self):
+        return {
+            "version" : str(self.version)
+        }
