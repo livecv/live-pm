@@ -33,8 +33,8 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     }
 
     widget.deselectAll();
-    widget.selectComponent("qt.57.clang_64");
-    widget.selectComponent("qt.57.webengine.clang_64");
+    widget.selectComponent("qt.511.clang_64");
+    widget.selectComponent("qt.511.webengine.clang_64");
 
     gui.clickButton(buttons.NextButton);
 }
