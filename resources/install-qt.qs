@@ -27,8 +27,8 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     var widget = gui.currentPageWidget();
 
     widget.deselectAll();
-    widget.selectComponent("qt.511.gcc_64");
-    widget.selectComponent("qt.511.webengine");
+    widget.selectComponent("qt.5111.gcc_64");
+    widget.selectComponent("qt.5111.webengine");
 
     gui.clickButton(buttons.NextButton);
 }
