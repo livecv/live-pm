@@ -43,7 +43,7 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     widget.selectComponent("qt.qt5.5111.clang_64");
     //widget.selectComponent("qt.qt5.5111.qtwebengine.clang_64");
 
-    //gui.clickButton(buttons.NextButton);
+    gui.clickButton(buttons.NextButton);
 }
 
 Controller.prototype.LicenseAgreementPageCallback = function() {

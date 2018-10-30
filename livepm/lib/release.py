@@ -43,7 +43,8 @@ class ReleaseQmake(ReleaseAction):
             'bin/qmake' + ('.exe' if platform.system().lower() == 'windows' else ''))
 
     def __call__(self, sourcedir, releasedir, environment = os.environ):
-        VSEnvironment.setupenv(140, 'x86_amd64')
+        if platform.system().lower() == 'windows':
+            VSEnvironment.setupenv(140, 'x86_amd64')
         proc = Process.run([self.qmakecommand] + self.options + [os.path.abspath(sourcedir)], self.run_dir(releasedir), environment)
         Process.trace('QMAKE: ', proc, end='')
 
