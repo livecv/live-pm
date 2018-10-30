@@ -3,10 +3,17 @@ function Controller() {
     installer.installationFinished.connect(function() {
         gui.clickButton(buttons.NextButton);
     })
+    var page = gui.pageWidgetByObjectName("WelcomePage")
+    page.completeChanged.connect(function()
+    {
+        if(gui.currentPageWidget().objectName == "WelcomePage") {
+            gui.clickButton( buttons.NextButton);   
+        }
+    })
 }
 
 Controller.prototype.WelcomePageCallback = function() {
-    gui.clickButton(buttons.NextButton);
+    //gui.clickButton(buttons.NextButton);
 }
 
 Controller.prototype.CredentialsPageCallback = function() {
@@ -33,10 +40,10 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
     }
 
     widget.deselectAll();
-    widget.selectComponent("qt.5111.clang_64");
-    widget.selectComponent("qt.5111.webengine.clang_64");
+    widget.selectComponent("qt.qt5.5111.clang_64");
+    //widget.selectComponent("qt.qt5.5111.qtwebengine.clang_64");
 
-    gui.clickButton(buttons.NextButton);
+    //gui.clickButton(buttons.NextButton);
 }
 
 Controller.prototype.LicenseAgreementPageCallback = function() {
