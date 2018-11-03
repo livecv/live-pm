@@ -141,6 +141,6 @@ class Builder:
 
         os.remove(sourcedir + '/config.pri')
         if ( os.path.exists(sourcedir + '/config.pri.bak') ):
-            os.rename(sourcedir + '/config.pri.bak', self.sourcedir + '/config.pri')
+            os.rename(sourcedir + '/config.pri.bak', sourcedir + '/config.pri')
 
 
