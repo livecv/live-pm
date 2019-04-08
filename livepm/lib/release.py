@@ -5,6 +5,7 @@ from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.releasesolveincludes import ReleaseSolveIncludes
 from livepm.lib.releasedylib import ReleaseDylibRelink, ReleaseDylibAddRPath
 from livepm.lib.releaseclean import ReleaseClean
+from livepm.lib.releasepopulate import ReleasePopulate
 from livepm.lib.process import Process
 from livepm.lib.filesystem import FileSystem
 from livepm.lib.winvsenviron import *
@@ -143,7 +144,8 @@ class Release:
             'solveincludes': ReleaseSolveIncludes,
             'dylibrelink': ReleaseDylibRelink,
             'dylibaddrpath': ReleaseDylibAddRPath,
-            'clean' : ReleaseClean
+            'clean' : ReleaseClean,
+            'populate' : ReleasePopulate
         }
         return actions[type](self, step, options)
 
