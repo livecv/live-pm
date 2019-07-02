@@ -61,7 +61,7 @@ class InstallCommand(Command):
             if os.environ != ["LIVEKEYS_DIR"]:
                 os.makedirs(plugin_directory)
             else:
-                # os.makedirs(plugin_directory)
+
                 pass
 
             jsonResponse = json.loads(r.text)
