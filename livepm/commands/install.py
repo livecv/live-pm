@@ -37,17 +37,16 @@ class InstallCommand(Command):
             try:
                 if os.environ['LIVEKEYS_DIR']:
                     self.dir = os.environ["LIVEKEYS_DIR"]
-                    self.folder = '/plugins/'
             except KeyError:
                 print("Enviroment variable LIVEKEYS_DIR not set.")
                 sys.exit(1)
         else:
             self.dir = os.getcwd()
-            self.folder = '/packages/'
+            self.folder = 'packages'
     
     def __call__(self):
         # Construct url
-        url = self.server_url + '/package/' + self.name + '/latest/' + self.release
+        url = os.path.join(self.server_url, 'package', self.name, 'latest', self.release)
         # Send request
         r = re.get(url, allow_redirects=True)
         
@@ -55,7 +54,8 @@ class InstallCommand(Command):
         if r.ok:
 
             # Create a folder for package
-            os.makedirs(self.dir + self.folder + self.name)
+            plugin_directory= os.path.join(self.dir, self.folder, self.name)
+            os.makedirs(plugin_directory)
 
             jsonResponse = json.loads(r.text)
             
@@ -66,7 +66,7 @@ class InstallCommand(Command):
             versions = jsonResponse['dependencies']
 
             # Download main package
-            package_path = self.dir + self.folder + self.name + '/' + self.name + '-' + jsonResponse['version']
+            package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
             open( package_path + '.zip', 'wb').write(getZip.content)
 
             # unzip main package and remove zip file
@@ -84,7 +84,7 @@ class InstallCommand(Command):
                     version = i['version']
                     packageName = i['package']
                     dependencyUrl = i['url']
-                    dependencyPath = self.dir + self.folder + self.name + '/' + packageName['name'] + '-' + i['version']
+                    dependencyPath = os.path.join(plugin_directory, packageName['name'] + '-' + i['version'])
 
                     # Download dependency
                     open( dependencyPath + '.zip' , 'wb').write(dependencyUrl.content)
