@@ -37,6 +37,7 @@ class InstallCommand(Command):
             try:
                 if os.environ['LIVEKEYS_DIR']:
                     self.dir = os.environ["LIVEKEYS_DIR"]
+                    self.folder = 'plugins'
             except KeyError:
                 print("Enviroment variable LIVEKEYS_DIR not set.")
                 sys.exit(1)
@@ -53,9 +54,15 @@ class InstallCommand(Command):
         # Check the url
         if r.ok:
 
-            # Create a folder for package
+            # Package path construction
             plugin_directory= os.path.join(self.dir, self.folder, self.name)
-            os.makedirs(plugin_directory)
+            
+            # Create folders if installing in cwd
+            if os.environ != ["LIVEKEYS_DIR"]:
+                os.makedirs(plugin_directory)
+            else:
+                # os.makedirs(plugin_directory)
+                pass
 
             jsonResponse = json.loads(r.text)
             
