@@ -5,6 +5,7 @@ import json
 import shutil
 import argparse
 import requests as re
+import urllib.parse
 import zipfile
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration
@@ -47,7 +48,8 @@ class InstallCommand(Command):
     
     def __call__(self):
         # Construct url
-        url = os.path.join(self.server_url, 'package', self.name, 'latest', self.release)
+        urlParams = 'package/' + self.name + '/' + 'latest/' + self.release
+        url = urllib.parse.urljoin(self.server_url, urlParams)
         # Send request
         r = re.get(url, allow_redirects=True)
         
@@ -61,7 +63,7 @@ class InstallCommand(Command):
             if os.environ != ["LIVEKEYS_DIR"]:
                 os.makedirs(plugin_directory)
             else:
-
+                # os.makedirs(plugin_directory)
                 pass
 
             jsonResponse = json.loads(r.text)
