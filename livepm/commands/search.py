@@ -26,7 +26,7 @@ class SearchCommand(Command):
     def parse_args(self, argv):
 
         parser = argparse.ArgumentParser(description='Search for a live package')
-        parser.add_argument('--keyword', '-k', default=None, help='Search term')
+        parser.add_argument('keyword', default=None, nargs='?', help='Search term')
         parser.add_argument('--server_url', '-sU', default=server_url, help='Change server url.')
             
         args = parser.parse_args(argv)
@@ -75,4 +75,4 @@ class SearchCommand(Command):
 
         else:
 
-            print("No match found for: " + self.keyword)
+            print("No match found for: " + self.name)

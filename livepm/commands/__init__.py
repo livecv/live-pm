@@ -8,7 +8,7 @@ from livepm.commands.new import NewCommand
 from livepm.commands.syncversion import SyncVersionCommand
 from livepm.commands.install import InstallCommand
 from livepm.commands.search import SearchCommand
-from livepm.commands.dependencies import SearchDependencies
+from livepm.commands.dependencies import DependenciesCommand
 
 commands_order = [
     BuildCommand,
@@ -20,7 +20,7 @@ commands_order = [
     HelpCommand,
     InstallCommand,
     SearchCommand,
-    SearchDependencies
+    DependenciesCommand
 ]  
 
 stored_commands = {c.name: c for c in commands_order}
