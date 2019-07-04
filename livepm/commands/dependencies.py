@@ -6,7 +6,6 @@ import shutil
 import argparse
 import requests as re
 import urllib.parse
-import zipfile
 import platform
 from columnar import columnar
 

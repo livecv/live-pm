@@ -6,7 +6,6 @@ import shutil
 import argparse
 import requests as re
 import urllib.parse
-import zipfile
 from columnar import columnar
 
 from livepm.lib.command import Command
