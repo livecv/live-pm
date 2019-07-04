@@ -35,16 +35,16 @@ class ListCommand(Command):
         # list packages
         if os.listdir(self.livekeys_dir):
             
-            for packages in os.listdir(self.livekeys_dir):
+            for package in os.listdir(self.livekeys_dir):
                 
-                print('>> ' + packages)
+                print('>> ' + package)
 
             # list packages in current dir if they exist
                 try:
                 
-                    for packages in os.listdir(self.current_dir):
+                    for package in os.listdir(self.current_dir):
 
-                        print('>> ' + packages)
+                        print('>> ' + package)
                 except:
                 
                     pass
