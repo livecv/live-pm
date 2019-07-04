@@ -7,6 +7,9 @@ from livepm.commands.makedoc import MakeDocCommand
 from livepm.commands.new import NewCommand
 from livepm.commands.syncversion import SyncVersionCommand
 from livepm.commands.install import InstallCommand
+from livepm.commands.search import SearchCommand
+from livepm.commands.dependencies import DependenciesCommand
+from livepm.commands.list import ListCommand
 
 commands_order = [
     BuildCommand,
@@ -16,7 +19,10 @@ commands_order = [
     NewCommand,
     SyncVersionCommand,
     HelpCommand,
-    InstallCommand
+    InstallCommand,
+    SearchCommand,
+    DependenciesCommand,
+    ListCommand
 ]  
 
 stored_commands = {c.name: c for c in commands_order}
