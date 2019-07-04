@@ -75,4 +75,4 @@ class SearchCommand(Command):
 
         else:
 
-            print("No match found for: " + self.name)
+            print("No match found for: " + self.keyword)
