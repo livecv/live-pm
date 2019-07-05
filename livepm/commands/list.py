@@ -4,10 +4,6 @@ import getopt
 import json
 import shutil
 import argparse
-import requests as re
-import urllib.parse
-import itertools
-from columnar import columnar
 
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration

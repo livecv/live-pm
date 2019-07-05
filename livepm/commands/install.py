@@ -35,13 +35,16 @@ class InstallCommand(Command):
   
         # Directory construction
         if args.install_globally:
+            
             try:
                 if os.environ['LIVEKEYS_DIR']:
                     self.dir = os.environ["LIVEKEYS_DIR"]
                     self.folder = 'plugins'
+
             except KeyError:
                 print("Enviroment variable LIVEKEYS_DIR not set.")
                 sys.exit(1)
+
         else:
             self.dir = os.getcwd()
             self.folder = 'packages'
@@ -62,6 +65,7 @@ class InstallCommand(Command):
             # Create folders if installing in cwd
             if os.environ != ["LIVEKEYS_DIR"]:
                 os.makedirs(plugin_directory)
+
             else:
                 # os.makedirs(plugin_directory)
                 pass
@@ -84,8 +88,45 @@ class InstallCommand(Command):
             zip.extractall(package_path)
             zip.close()
             os.remove(package_path + '.zip')
-    
-            # Dependency recursive download
+
+            # Check for package.json and create one if missing
+            for package in os.listdir(os.path.join(self.dir, self.folder)):
+                
+                if package.startswith(self.name):
+                    path = os.path.join(plugin_directory)
+                    print(package)
+                    
+                    try:
+                        if os.listdir(os.path.join(path, 'live.package.json')):
+                        
+                            for file in os.listdir(path):
+                                
+                                with open(os.path.join(path,"live.packages.json"), "w+") as livePackages:
+                                    
+                                    package_details = {
+                                        
+                                        'name': self.name,
+                                        'version': jsonResponse['version']
+                                        }
+
+                                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+                                    
+                    except:
+                        
+                        print('live.package.json not found! Creating one.')
+                            
+                        with open(os.path.join(path,"live.packages.json"), "a") as livePackages:
+                                
+                                package_details = {
+                                    
+                                    'name': self.name,
+                                    'version': jsonResponse['version']
+                                            
+                                            }
+
+                                json.dump(package_details, livePackages)
+                                
+            # Dependency download
             def downloadDependencies(versions):
                 
                 for i in versions:
@@ -95,6 +136,23 @@ class InstallCommand(Command):
                     dependencyUrl = i['url']
                     dependencyPath = os.path.join(plugin_directory, packageName['name'] + '-' + i['version'])
 
+                    # Add dependencies info in live.packages.json
+                    with open(os.path.join(path,"live.packages.json"), "a") as livePackages:
+                        
+                        package_details = {
+
+                          'dependencies': {
+
+                            'name': i['package']['name'],
+
+                            'version': i['version']
+
+                          }
+
+                        }
+
+                        json.dump(package_details, livePackages, ensure_ascii=False, indent=4)
+                        
                     # Download dependency
                     open( dependencyPath + '.zip' , 'wb').write(dependencyUrl.content)
 
@@ -104,7 +162,6 @@ class InstallCommand(Command):
                     zip.extractall(dependencyPath)
                     zip.close()
                     os.remove(dependencyPath + '.zip')
-
                     downloadDependencies(i['dependencies'])
                     
             downloadDependencies(versions)
