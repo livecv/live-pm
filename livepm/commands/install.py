@@ -89,73 +89,85 @@ class InstallCommand(Command):
             zip.close()
             os.remove(package_path + '.zip')
 
-            # Check for package.json and create one if missing
-            for package in os.listdir(os.path.join(self.dir, self.folder)):
-                
-                if package.startswith(self.name):
-                    path = os.path.join(plugin_directory)
-                    print(package)
+            # Create live.packages.json for project
+            package = {self.name:jsonResponse['version']}
+            if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
+
+                with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                    data = json.load(livePackages)
+                    current = data['dependencies']
+                    current.update(package)
+
+                with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
                     
-                    try:
-                        if os.listdir(os.path.join(path, 'live.package.json')):
+                    package_details = {
                         
-                            for file in os.listdir(path):
-                                
-                                with open(os.path.join(path,"live.packages.json"), "w+") as livePackages:
-                                    
-                                    package_details = {
-                                        
-                                        'name': self.name,
-                                        'version': jsonResponse['version']
-                                        }
-
-                                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
-                                    
-                    except:
+                        "name": os.path.basename(os.getcwd()), 
+                        "version": '1.0.1',
+                        "dependencies": current
                         
-                        print('live.package.json not found! Creating one.')
-                            
-                        with open(os.path.join(path,"live.packages.json"), "a") as livePackages:
-                                
-                                package_details = {
-                                    
-                                    'name': self.name,
-                                    'version': jsonResponse['version']
-                                            
-                                            }
+                        }
+                        
+                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
 
-                                json.dump(package_details, livePackages)
-                                
+            else:
+            
+                with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
+                    package_details = {
+                        
+                        "name": os.path.basename(os.getcwd()), 
+                        "version": '1.0.1',
+                        "dependencies": package
+
+                        }
+                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+
             # Dependency download
             def downloadDependencies(versions):
                 
                 for i in versions:
 
                     version = i['version']
-                    packageName = i['package']
+                    packageName = i['package']['name']
                     dependencyUrl = i['url']
-                    dependencyPath = os.path.join(plugin_directory, packageName['name'] + '-' + i['version'])
+                    dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
 
                     # Add dependencies info in live.packages.json
-                    with open(os.path.join(path,"live.packages.json"), "a") as livePackages:
+                    package = {packageName:version}
+                    if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
+
+                        with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
+                            data = json.load(livePackages)
+                            current = data['dependencies']
+                            current.update(package)
+
+                        with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
+                            
+                            package_details = {
+                                
+                                "name": os.path.basename(plugin_directory), 
+                                "version": jsonResponse['version'],
+                                "dependencies": current
+                                
+                                }
+                                
+                            json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+
+                    else:
                         
-                        package_details = {
-
-                          'dependencies': {
-
-                            'name': i['package']['name'],
-
-                            'version': i['version']
-
-                          }
-
-                        }
-
-                        json.dump(package_details, livePackages, ensure_ascii=False, indent=4)
+                        with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
                         
+                            package_details = {
+                                "name": os.path.basename(plugin_directory), 
+                                "version": jsonResponse['version'],
+                                "dependencies": package
+
+                            }
+                            json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+
+
                     # Download dependency
-                    open( dependencyPath + '.zip' , 'wb').write(dependencyUrl.content)
-
+                    open( dependencyPath + '.zip' , 'wb').write(getZip.content)
                     # unzip main package and remove zip file
                     zipPath = (dependencyPath + '.zip')
                     zip = zipfile.ZipFile(zipPath)

@@ -50,7 +50,7 @@ class UninstallCommand(Command):
 
                 self.dir = os.getcwd()
                 self.folder = 'packages'
-                os.listdir(self.dir, self.folder)
+                os.listdir(os.path.join(self.dir, self.folder))
             
             except:
 
@@ -74,13 +74,25 @@ class UninstallCommand(Command):
                 if package.startswith(self.name):
                     
                     shutil.rmtree(os.path.join(directory, package))
-            
+                    
+                    # Remove package from live.package.json
+                    if os.path.exists(os.path.join(os.getcwd(), "live.packages.json")):
+                        
+                        with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                            data = json.load(livePackages)
+
+                            data['dependencies'].pop(self.name)
+
+                        with open(os.path.join(os.getcwd(),"live.packages.json"),'w') as livePackages:
+                            json.dump(data, livePackages, ensure_ascii=False, indent=4)
+
                     print('>> Package removed: ' + package)
+
                     exit()
 
                 else:
 
-                    print('Package ' + self.name + ' not found.')  
+                    print('Package ' + self.name + ' not found.') 
 
 
                    
