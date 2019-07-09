@@ -10,6 +10,7 @@ from livepm.commands.install import InstallCommand
 from livepm.commands.search import SearchCommand
 from livepm.commands.dependencies import DependenciesCommand
 from livepm.commands.list import ListCommand
+from livepm.commands.uninstall import UninstallCommand
 
 commands_order = [
     BuildCommand,
@@ -22,7 +23,8 @@ commands_order = [
     InstallCommand,
     SearchCommand,
     DependenciesCommand,
-    ListCommand
+    ListCommand,
+    UninstallCommand
 ]  
 
 stored_commands = {c.name: c for c in commands_order}
