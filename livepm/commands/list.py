@@ -28,22 +28,20 @@ class ListCommand(Command):
 
     def __call__(self):
         
-        # list packages
-        if os.listdir(self.livekeys_dir):
+        # list packages livekeys_dir
+        if os.listdir(self.livekeys_dir) and os.listdir(self.current_dir):
             
             for package in os.listdir(self.livekeys_dir):
                 
                 print('>> ' + package)
-
-            # list packages in current dir if they exist
-                try:
                 
-                    for package in os.listdir(self.current_dir):
+        # list packages current dir
+        elif os.listdir(self.current_dir):
+            
+            for package in os.listdir(self.current_dir):
 
-                        print('>> ' + package)
-                except:
-                
-                    pass
+                print('>> ' + package)
+
         else:
 
             print('No packages found.')

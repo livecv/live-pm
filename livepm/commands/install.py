@@ -55,20 +55,33 @@ class InstallCommand(Command):
         url = urllib.parse.urljoin(self.server_url, urlParams)
         # Send request
         r = re.get(url, allow_redirects=True)
-        
+                    
         # Check the url
         if r.ok:
+
+            # Check if the package.lock exist and create one if not
+            if not os.path.exists(os.path.join(os.getcwd(), 'live.package.lock')):
+                open(os.path.join(os.getcwd(), 'live.package.lock'),'w')
+
+            else:
+                print('Already running!')
+                sys.exit(1)
 
             # Package path construction
             plugin_directory= os.path.join(self.dir, self.folder, self.name)
             
-            # Create folders if installing in cwd
+            # Create folder if installing in cwd
             if os.environ != ["LIVEKEYS_DIR"]:
-                os.makedirs(plugin_directory)
 
-            else:
-                # os.makedirs(plugin_directory)
-                pass
+                # Check if the package is installed
+                try:
+                    os.makedirs(plugin_directory)
+
+                except:
+                    print('Package ' + self.name + ' already installed.')
+                    # remove package.lock
+                    os.remove(os.path.join(os.getcwd(), 'live.package.lock'))
+                    sys.exit(1)
 
             jsonResponse = json.loads(r.text)
             
@@ -78,7 +91,8 @@ class InstallCommand(Command):
             # Read dependencies
             versions = jsonResponse['dependencies']
 
-            # Download main package
+
+            # install main package
             package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
             open( package_path + '.zip', 'wb').write(getZip.content)
 
@@ -177,5 +191,9 @@ class InstallCommand(Command):
                     downloadDependencies(i['dependencies'])
                     
             downloadDependencies(versions)
+
+            # remove package.lock
+            os.remove(os.path.join(os.getcwd(), 'live.package.lock'))
+
         else:
             print("Package not found")

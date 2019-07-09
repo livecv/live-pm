@@ -21,7 +21,7 @@ class UninstallCommand(Command):
 
         parser = argparse.ArgumentParser(description='Removes a package')
 
-        parser.add_argument('--name', '-n', default=None, help='Name of the package')
+        parser.add_argument('name', default=None, help='Name of the package')
         parser.add_argument('--uninstall_globally', '-g' ,default=False, action='store_true', help="Removes package from livekeys_dir")
 
         args = parser.parse_args(argv)
