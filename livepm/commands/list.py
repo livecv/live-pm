@@ -27,22 +27,25 @@ class ListCommand(Command):
         self.current_dir = os.path.join(os.getcwd(), 'packages')
 
     def __call__(self):
+
+        livekeys_dir_list = os.listdir(self.livekeys_dir)
+        current_dir_list = os.listdir(self.current_dir)
+
+        # list packages from livekeys_dir
+        if livekeys_dir_list:
+            
+            for package in livekeys_dir_list:
+                
+                print('>> ' + package)
+        # list packages from current dir
+        if current_dir_list:
+
+            for package in current_dir_list:
+
+                print('>> ' + package)
         
-        # list packages livekeys_dir
-        if os.listdir(self.livekeys_dir) and os.listdir(self.current_dir):
-            
-            for package in os.listdir(self.livekeys_dir):
-                
-                print('>> ' + package)
-                
-        # list packages current dir
-        elif os.listdir(self.current_dir):
-            
-            for package in os.listdir(self.current_dir):
-
-                print('>> ' + package)
-
         else:
 
             print('No packages found.')
-                
+            
+               

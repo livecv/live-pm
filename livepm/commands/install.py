@@ -106,31 +106,25 @@ class InstallCommand(Command):
             # Create live.packages.json for project
             package = {self.name:jsonResponse['version']}
             if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
-
+                
+                # Read live.packages.json
                 with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
                     data = json.load(livePackages)
                     current = data['dependencies']
                     current.update(package)
 
+                # Write updated data
                 with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
                     
-                    package_details = {
-                        
-                        "name": os.path.basename(os.getcwd()), 
-                        "version": '1.0.1',
-                        "dependencies": current
-                        
-                        }
-                        
-                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+                    json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
             else:
-            
+                # Create live.packages.json and write default data
                 with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
                     package_details = {
                         
                         "name": os.path.basename(os.getcwd()), 
-                        "version": '1.0.1',
+                        "version": '0.1.0',
                         "dependencies": package
 
                         }
@@ -146,29 +140,23 @@ class InstallCommand(Command):
                     dependencyUrl = i['url']
                     dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
 
-                    # Add dependencies info in live.packages.json
                     package = {packageName:version}
+                    # Check if the live.packages.json exist
                     if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
-
+                       
+                        # Read from file if exists
                         with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
                             data = json.load(livePackages)
                             current = data['dependencies']
                             current.update(package)
 
+                        # Write updated data
                         with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
-                            
-                            package_details = {
                                 
-                                "name": os.path.basename(plugin_directory), 
-                                "version": jsonResponse['version'],
-                                "dependencies": current
-                                
-                                }
-                                
-                            json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+                            json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
                     else:
-                        
+                        # Create live.packages.json and write default data
                         with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
                         
                             package_details = {
