@@ -4,10 +4,6 @@ import getopt
 import json
 import shutil
 import argparse
-import requests as re
-import urllib.parse
-import itertools
-from columnar import columnar
 
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration
@@ -31,24 +27,25 @@ class ListCommand(Command):
         self.current_dir = os.path.join(os.getcwd(), 'packages')
 
     def __call__(self):
-        
-        # list packages
-        if os.listdir(self.livekeys_dir):
+
+        livekeys_dir_list = os.listdir(self.livekeys_dir)
+        current_dir_list = os.listdir(self.current_dir)
+
+        # list packages from livekeys_dir
+        if livekeys_dir_list:
             
-            for package in os.listdir(self.livekeys_dir):
+            for package in livekeys_dir_list:
                 
                 print('>> ' + package)
+        # list packages from current dir
+        if current_dir_list:
 
-            # list packages in current dir if they exist
-                try:
-                
-                    for package in os.listdir(self.current_dir):
+            for package in current_dir_list:
 
-                        print('>> ' + package)
-                except:
-                
-                    pass
+                print('>> ' + package)
+        
         else:
 
             print('No packages found.')
-                
+            
+               
