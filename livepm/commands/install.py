@@ -7,6 +7,8 @@ import argparse
 import requests as re
 import urllib.parse
 import zipfile
+from tqdm import tqdm
+from time import sleep
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration
 
@@ -91,95 +93,98 @@ class InstallCommand(Command):
             # Read dependencies
             versions = jsonResponse['dependencies']
 
+            # Progress bar for package download
+            for i in tqdm(range(100),ncols=80, desc="Installing "+ self.name, bar_format='{l_bar}{bar}|'):
+                # install main package
+                package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
+                open( package_path + '.zip', 'wb').write(getZip.content)
 
-            # install main package
-            package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
-            open( package_path + '.zip', 'wb').write(getZip.content)
+                # unzip main package and remove zip file
+                zipPath = (package_path + '.zip')
+                zip = zipfile.ZipFile(zipPath)
+                zip.extractall(package_path)
+                zip.close()
+                os.remove(package_path + '.zip')
 
-            # unzip main package and remove zip file
-            zipPath = (package_path + '.zip')
-            zip = zipfile.ZipFile(zipPath)
-            zip.extractall(package_path)
-            zip.close()
-            os.remove(package_path + '.zip')
-
-            # Create live.packages.json for project
-            package = {self.name:jsonResponse['version']}
-            if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
-                
-                # Read live.packages.json
-                with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
-                    data = json.load(livePackages)
-                    current = data['dependencies']
-                    current.update(package)
-
-                # Write updated data
-                with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
+                # Create live.packages.json for project
+                package = {self.name:jsonResponse['version']}
+                if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
                     
-                    json.dump(data, livePackages,ensure_ascii=False, indent=4)
+                    # Read live.packages.json
+                    with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                        data = json.load(livePackages)
+                        current = data['dependencies']
+                        current.update(package)
 
-            else:
-                # Create live.packages.json and write default data
-                with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
-                    package_details = {
+                    # Write updated data
+                    with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
                         
-                        "name": os.path.basename(os.getcwd()), 
-                        "version": '0.1.0',
-                        "dependencies": package
+                        json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
-                        }
-                    json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
-
-            # Dependency download
-            def downloadDependencies(versions):
-                
-                for i in versions:
-
-                    version = i['version']
-                    packageName = i['package']['name']
-                    dependencyUrl = i['url']
-                    dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
-
-                    package = {packageName:version}
-                    # Check if the live.packages.json exist
-                    if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
-                       
-                        # Read from file if exists
-                        with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
-                            data = json.load(livePackages)
-                            current = data['dependencies']
-                            current.update(package)
-
-                        # Write updated data
-                        with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
-                                
-                            json.dump(data, livePackages,ensure_ascii=False, indent=4)
-
-                    else:
-                        # Create live.packages.json and write default data
-                        with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
-                        
-                            package_details = {
-                                "name": os.path.basename(plugin_directory), 
-                                "version": jsonResponse['version'],
-                                "dependencies": package
+                else:
+                    # Create live.packages.json and write default data
+                    with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
+                        package_details = {
+                            
+                            "name": os.path.basename(os.getcwd()), 
+                            "version": '0.1.0',
+                            "dependencies": package
 
                             }
-                            json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+                        json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
 
-
-                    # Download dependency
-                    open( dependencyPath + '.zip' , 'wb').write(getZip.content)
-                    # unzip main package and remove zip file
-                    zipPath = (dependencyPath + '.zip')
-                    zip = zipfile.ZipFile(zipPath)
-                    zip.extractall(dependencyPath)
-                    zip.close()
-                    os.remove(dependencyPath + '.zip')
-                    downloadDependencies(i['dependencies'])
+            # Progress bar for dependencies download
+            for i in tqdm(range(100),ncols=80,desc="Installing dependencies", bar_format='{l_bar}{bar}|'):
+                
+                # Dependency download
+                def downloadDependencies(versions):
                     
-            downloadDependencies(versions)
+                    for i in (versions):
 
+                        version = i['version']
+                        packageName = i['package']['name']
+                        dependencyUrl = i['url']
+                        dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
+
+                        package = {packageName:version}
+                        # Check if the live.packages.json exist
+                        if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
+                        
+                            # Read from file if exists
+                            with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
+                                data = json.load(livePackages)
+                                current = data['dependencies']
+                                current.update(package)
+
+                            # Write updated data
+                            with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
+                                    
+                                json.dump(data, livePackages,ensure_ascii=False, indent=4)
+
+                        else:
+                            # Create live.packages.json and write default data
+                            with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
+                            
+                                package_details = {
+                                    "name": os.path.basename(plugin_directory), 
+                                    "version": jsonResponse['version'],
+                                    "dependencies": package
+
+                                }
+                                json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
+
+
+                        # Download dependency
+                        open( dependencyPath + '.zip' , 'wb').write(getZip.content)
+                        # unzip main package and remove zip file
+                        zipPath = (dependencyPath + '.zip')
+                        zip = zipfile.ZipFile(zipPath)
+                        zip.extractall(dependencyPath)
+                        zip.close()
+                        os.remove(dependencyPath + '.zip')
+                        downloadDependencies(i['dependencies'])
+                        
+                downloadDependencies(versions)
             # remove package.lock
             os.remove(os.path.join(os.getcwd(), 'live.package.lock'))
 
