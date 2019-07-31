@@ -33,6 +33,7 @@ class InstallCommand(Command):
         self.name   = args.name
         self.release   = args.release
         self.server_url   = args.server_url
+        self.current_version = ''
   
         # Directory construction
         if args.install_globally:
@@ -60,7 +61,6 @@ class InstallCommand(Command):
             if progress >=1: 
                 msg += "DONE\r\n"
             sys.stdout.write(msg)
-            time.sleep(0.1)
             sys.stdout.flush()
 
         # Dependency download
@@ -109,20 +109,20 @@ class InstallCommand(Command):
                         package_details = {
                             
                             "name": os.path.basename(plugin_directory), 
-                            "version": i['version'],
+                            "version": self.current_version,
                             "dependencies": package
                             }
                         json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
 
-                        # Download dependency
-                        open( dependencyPath + '.zip' , 'wb').write(getZip.content)
-                        # unzip main package and remove zip file
-                        zipPath = (dependencyPath + '.zip')
-                        zip = zipfile.ZipFile(zipPath)
-                        zip.extractall(dependencyPath)
-                        zip.close()
-                        os.remove(dependencyPath + '.zip')
-                        downloadDependencies(i['dependencies'])
+                # Download dependency
+                open( dependencyPath + '.zip' , 'wb').write(getZip.content)
+                # unzip main package and remove zip file
+                zipPath = (dependencyPath + '.zip')
+                zip = zipfile.ZipFile(zipPath)
+                zip.extractall(dependencyPath)
+                zip.close()
+                os.remove(dependencyPath + '.zip')
+                downloadDependencies(i['dependencies'])
 
         # Download from json list here
         if not self.name:
@@ -147,10 +147,12 @@ class InstallCommand(Command):
                     
                     # Package installation progress bar
                     num_of_packages = data['dependencies']
+                    
                     # use number of packages for iteration
                     for i in range(len(num_of_packages)):
                         update_progress("installing packages: ", i/len(num_of_packages))
-                                # Finished
+
+                    # Finished
                     update_progress("Installing packages: ", 1)
 
                     for package, version in data['dependencies'].items():
@@ -270,6 +272,7 @@ class InstallCommand(Command):
                 zip.close()
                 os.remove(package_path + '.zip')
                 # Create live.packages.json for project
+                self.current_version = jsonResponse['version']
                 package = {self.name:jsonResponse['version']}
                 if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
                     
@@ -300,7 +303,7 @@ class InstallCommand(Command):
 
                 # remove package.lock
                 os.remove(os.path.join(os.getcwd(), 'live.package.lock'))
-                
+
             else:
 
                 print("Package not found")

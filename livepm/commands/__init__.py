@@ -11,6 +11,7 @@ from livepm.commands.search import SearchCommand
 from livepm.commands.dependencies import DependenciesCommand
 from livepm.commands.list import ListCommand
 from livepm.commands.uninstall import UninstallCommand
+from livepm.commands.update import UpdateCommand
 
 commands_order = [
     BuildCommand,
@@ -24,7 +25,8 @@ commands_order = [
     SearchCommand,
     DependenciesCommand,
     ListCommand,
-    UninstallCommand
+    UninstallCommand,
+    UpdateCommand
 ]  
 
 stored_commands = {c.name: c for c in commands_order}
