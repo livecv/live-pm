@@ -73,6 +73,7 @@ class InstallCommand(Command):
             if progress >=1: 
                 msg += "DONE\r\n"
             sys.stdout.write(msg)
+            time.sleep(0.1)
             sys.stdout.flush()
 
         # Dependency download
@@ -86,13 +87,7 @@ class InstallCommand(Command):
                 dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
 
                 package = {packageName:version}
-        
-                update_progress("installing dependency: " + packageName, len(versions))
 
-                # finished
-                # update_progress("Installing dependencies:", 1)
-                
-                # Check if the live.packages.json exist
                 if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
                     
                     # Read from file if exists
@@ -135,16 +130,7 @@ class InstallCommand(Command):
                 # read json
                 with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
                     data = json.load(livePackages)
-                    
-                    # # Package installation progress bar
-                    # num_of_packages = len(data['dependencies'])
-                    # # use number of packages for iteration
-                    # for i in range(num_of_packages):
-                    #     update_progress("installing packages: ", i/num_of_packages)
-
-                    # # Finished
-                    # update_progress("Installing packages: ", 1)
-
+                
                     for package, version in data['dependencies'].items():
 
                         urlParams = 'package/' + package + '/release/' + version + '/' + release
@@ -158,8 +144,18 @@ class InstallCommand(Command):
 
                             # current package dependencies
                             dependencies = resp['dependencies']
-                            update_progress("Installing " + package, len(dependencies))
-                            sys.stdout.flush()
+
+                            # Package installation progress bar
+                            num_of_packages = []
+                            # Append id's of packages for package count
+                            num_of_packages.append(resp['package'])
+                            # # use number of packages for iteration
+                            for i in range(len(num_of_packages)):
+                                update_progress("installing " + package, i/len(num_of_packages))
+
+                            # Finished
+                            update_progress("Installing " + package, 1)
+
                             # Request the zip file
                             getZip = re.get(resp['url'])
                             
@@ -191,6 +187,13 @@ class InstallCommand(Command):
                                 package = {self.name:self.current_version}
 
                                 downloadDependencies(dependencies)
+                                for i in resp['dependencies']:
+                                    progressBarLen = i['dependencies']
+
+                                for i in range(len(progressBarLen)):
+                                    update_progress("installing dependencies:", i/len(progressBarLen))
+                                # # Finished
+                                update_progress("Installing dependencies:" , 1)
                             
                         # Note if the package is not found
                         else:
@@ -250,10 +253,10 @@ class InstallCommand(Command):
                 num_of_packages.append(jsonResponse['package'])
                 # # use number of packages for iteration
                 for i in range(len(num_of_packages)):
-                    update_progress("installing packages: ", i/len(num_of_packages))
+                    update_progress("installing " + self.name, i/len(num_of_packages))
 
                 # Finished
-                update_progress("Installing packages: ", 1)
+                update_progress("Installing " + self.name, 1)
 
                 # install main packages
                 package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
@@ -294,6 +297,14 @@ class InstallCommand(Command):
                         json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
                 
                 downloadDependencies(versions)
+
+                for i in jsonResponse['dependencies']:
+                    progressBarLen = i['dependencies']
+
+                for i in range(len(progressBarLen)):
+                    update_progress("installing dependencies for " + self.name, i/len(progressBarLen))
+                # # Finished
+                update_progress("Installing dependencies for " + self.name, 1)
 
                 # remove package.lock
                 os.remove(os.path.join(os.getcwd(), 'live.package.lock'))
