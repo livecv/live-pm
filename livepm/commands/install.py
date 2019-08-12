@@ -73,7 +73,6 @@ class InstallCommand(Command):
             if progress >=1: 
                 msg += "DONE\r\n"
             sys.stdout.write(msg)
-            time.sleep(0.1)
             sys.stdout.flush()
 
         # Dependency download
