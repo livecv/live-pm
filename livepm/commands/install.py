@@ -78,19 +78,6 @@ class InstallCommand(Command):
         # Dependency download
         def downloadDependencies(versions):
 
-            # Dependency installation progress bar
-            num_of_packages = []
-            # Append id's of versions for package count
-            for i in versions:
-                num_of_packages.append(i['_id'])
-
-                # use number of packages for iteration
-                for i in range(len(num_of_packages)):
-                    update_progress("installing dependencies: ", i/len(num_of_packages))
-
-                # finished
-                update_progress("Installing dependencies:", 1)
-
             for i in versions:
                 
                 version = i['version']
@@ -99,6 +86,11 @@ class InstallCommand(Command):
                 dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
 
                 package = {packageName:version}
+        
+                update_progress("installing dependency: " + packageName, len(versions))
+
+                # finished
+                # update_progress("Installing dependencies:", 1)
                 
                 # Check if the live.packages.json exist
                 if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
@@ -144,14 +136,14 @@ class InstallCommand(Command):
                 with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
                     data = json.load(livePackages)
                     
-                    # Package installation progress bar
-                    num_of_packages = data['dependencies']
-                    # use number of packages for iteration
-                    for i in range(len(num_of_packages)):
-                        update_progress("installing packages: ", i/len(num_of_packages))
+                    # # Package installation progress bar
+                    # num_of_packages = len(data['dependencies'])
+                    # # use number of packages for iteration
+                    # for i in range(num_of_packages):
+                    #     update_progress("installing packages: ", i/num_of_packages)
 
-                    # Finished
-                    update_progress("Installing packages: ", 1)
+                    # # Finished
+                    # update_progress("Installing packages: ", 1)
 
                     for package, version in data['dependencies'].items():
 
@@ -166,7 +158,8 @@ class InstallCommand(Command):
 
                             # current package dependencies
                             dependencies = resp['dependencies']
-
+                            update_progress("Installing " + package, len(dependencies))
+                            sys.stdout.flush()
                             # Request the zip file
                             getZip = re.get(resp['url'])
                             
@@ -181,7 +174,7 @@ class InstallCommand(Command):
 
                             package_path = os.path.join(plugin_directory, package + '-' + version)
                             if os.path.exists(package_path):
-                                print('Package: ' + package + ' ' + version + 'already installed')
+                                print('Package: ' + package + ' ' + version + ' already installed')
 
                             else:
 
