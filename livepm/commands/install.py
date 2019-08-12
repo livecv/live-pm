@@ -53,6 +53,18 @@ class InstallCommand(Command):
     
     def __call__(self):
 
+        # Get the os for release extension
+        if platform.system() == 'Linux':
+            release = 'linux'
+
+        elif platform.system() == 'Darwin':
+
+            release = 'macos'
+
+        elif platform.system() == 'Windows':
+
+            release = 'win'
+
         # progress bar
         def update_progress(title, progress):
             length = 40
@@ -124,30 +136,16 @@ class InstallCommand(Command):
                 os.remove(dependencyPath + '.zip')
                 downloadDependencies(i['dependencies'])
 
-        # Download from json list here
+        # Install from json list here
         if not self.name:
 
             if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
                 # read json
                 with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
                     data = json.load(livePackages)
-
-                    # Get the os for release extension
-                    if platform.system() == 'Linux':
-                        
-                        release = 'linux'
-
-                    elif platform.system() == 'Darwin':
-
-                        release = 'macos'
-
-                    elif platform.system() == 'Windows':
-
-                        release = 'win'
                     
                     # Package installation progress bar
                     num_of_packages = data['dependencies']
-                    
                     # use number of packages for iteration
                     for i in range(len(num_of_packages)):
                         update_progress("installing packages: ", i/len(num_of_packages))
@@ -195,6 +193,9 @@ class InstallCommand(Command):
                                 zip.extractall(package_path)
                                 zip.close()
                                 os.remove(package_path + '.zip')
+
+                                self.current_version = resp['version']
+                                package = {self.name:self.current_version}
 
                                 downloadDependencies(dependencies)
                             
@@ -273,7 +274,7 @@ class InstallCommand(Command):
                 os.remove(package_path + '.zip')
                 # Create live.packages.json for project
                 self.current_version = jsonResponse['version']
-                package = {self.name:jsonResponse['version']}
+                package = {self.name:self.current_version}
                 if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
                     
                     # Read live.packages.json
