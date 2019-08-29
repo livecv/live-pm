@@ -33,19 +33,21 @@ class ListCommand(Command):
 
         # list packages from livekeys_dir
         if livekeys_dir_list:
+
+            print("Globally installed packages:\n")
+            
             
             for package in livekeys_dir_list:
                 
-                print('>> ' + package)
+                print(' > ' + package)
+
+        print("\nLocally installed packages:\n")
+
         # list packages from current dir
         if current_dir_list:
 
             for package in current_dir_list:
 
-                print('>> ' + package)
-        
-        else:
-
-            print('No packages found.')
+                print(' > ' + package)
             
                

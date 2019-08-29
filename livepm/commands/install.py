@@ -53,6 +53,7 @@ class InstallCommand(Command):
         # Construct url
         urlParams = 'package/' + self.name + '/' + 'latest/' + self.release
         url = urllib.parse.urljoin(self.server_url, urlParams)
+
         # Send request
         r = re.get(url, allow_redirects=True)
                     
