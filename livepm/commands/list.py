@@ -31,18 +31,21 @@ class ListCommand(Command):
         livekeys_dir_list = os.listdir(self.livekeys_dir)
         current_dir_list = os.listdir(self.current_dir)
 
+
         # list packages from livekeys_dir
         if livekeys_dir_list:
             
-            for package in livekeys_dir_list:
-                
-                print('>> ' + package)
+            for i in livekeys_dir_list:
+                with open("live.packages.json") as livePackages:
+                    data = json.load(livePackages)
+                    print('>> ' + data['name'] + '-' + data['version'])
         # list packages from current dir
         if current_dir_list:
-
-            for package in current_dir_list:
-
-                print('>> ' + package)
+            
+            for i in current_dir_list:
+                with open("live.packages.json") as livePackages:
+                    data = json.load(livePackages)
+                    print('>> ' + data['name'] + '-' + data['version'])
         
         else:
 

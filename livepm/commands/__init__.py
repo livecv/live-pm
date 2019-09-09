@@ -12,6 +12,8 @@ from livepm.commands.dependencies import DependenciesCommand
 from livepm.commands.list import ListCommand
 from livepm.commands.uninstall import UninstallCommand
 from livepm.commands.update import UpdateCommand
+from livepm.commands.show import ShowCommand
+from livepm.commands.showremote import ShowRemoteCommand
 
 commands_order = [
     BuildCommand,
@@ -26,7 +28,9 @@ commands_order = [
     DependenciesCommand,
     ListCommand,
     UninstallCommand,
-    UpdateCommand
+    UpdateCommand,
+    ShowCommand,
+    ShowRemoteCommand
 ]  
 
 stored_commands = {c.name: c for c in commands_order}

@@ -23,15 +23,14 @@ class InstallCommand(Command):
 
     def parse_args(self, argv):
         parser = argparse.ArgumentParser(description='Install a live package')
-        parser.add_argument('--name', '-n', default=None, help='Name of the package')
-        parser.add_argument('--release', '-r', default=None, help='Package release')
+        parser.add_argument('name', default=None, nargs='?', help='Name of the package')
         parser.add_argument('--server_url', '-sU', default=server_url, help='Change server url.')
         parser.add_argument('--install_globally', '-g' ,default=False, action='store_true', help="Install to livekeys dir")
 
         args = parser.parse_args(argv)
 
         self.name   = args.name
-        self.release   = args.release
+        self.release   = ''
         self.server_url   = args.server_url
         self.current_version = ''
   
@@ -55,15 +54,24 @@ class InstallCommand(Command):
 
         # Get the os for release extension
         if platform.system() == 'Linux':
-            release = 'linux'
+            self.release = 'linux'
 
         elif platform.system() == 'Darwin':
 
-            release = 'macos'
+            self.release = 'macos'
 
         elif platform.system() == 'Windows':
 
-            release = 'win'
+            self.release = 'win'
+
+        # Check url here
+        try:
+            r = re.get(self.server_url)
+            
+        except:
+            print('Invalid url.')
+            sys.exit(1)
+
 
         # progress bar
         def update_progress(title, progress):
@@ -83,31 +91,31 @@ class InstallCommand(Command):
                 version = i['version']
                 packageName = i['package']['name']
                 dependencyUrl = i['url']
-                dependencyPath = os.path.join(plugin_directory, packageName + '-' + version)
+                dependencyPath = os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), packageName + '-' + version[:-4])
 
-                package = {packageName:version}
-
-                if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
+                package = {packageName:version[:-4]}
+                
+                if os.path.exists(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json')):
                     
                     # Read from file if exists
-                    with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
+                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json')) as livePackages:
                         data = json.load(livePackages)
                         current = data['dependencies']
                         current.update(package)
 
                         # Write updated data
-                        with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
+                        with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json'), "w") as livePackages:
                             
                             json.dump(data, livePackages,ensure_ascii=False, indent=4)
                             
                 else:
                     # Create live.packages.json and write default data
-                    with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
+                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]),"live.packages.json"), 'w') as livePackages:
                         
                         package_details = {
                             
-                            "name": os.path.basename(plugin_directory), 
-                            "version": self.current_version,
+                            "name": self.name, 
+                            "version": self.current_version[:-4],
                             "dependencies": package
                             }
                         json.dump(package_details, livePackages,ensure_ascii=False, indent=4)
@@ -132,7 +140,7 @@ class InstallCommand(Command):
                 
                     for package, version in data['dependencies'].items():
 
-                        urlParams = 'package/' + package + '/release/' + version + '/' + release
+                        urlParams = 'package/' + package + '/release/' + version + '/' + self.release
                         url = urllib.parse.urljoin(self.server_url, urlParams)
                         r = re.get(url, allow_redirects=True)
 
@@ -159,7 +167,7 @@ class InstallCommand(Command):
                             getZip = re.get(resp['url'])
                             
                             # # install main packages
-                            plugin_directory= os.path.join(self.dir, self.folder, package )
+                            plugin_directory= os.path.join(self.dir, self.folder)
 
                             if not os.path.exists(plugin_directory):
                                 os.makedirs(plugin_directory)
@@ -167,7 +175,7 @@ class InstallCommand(Command):
                             else:
                                 pass
 
-                            package_path = os.path.join(plugin_directory, package + '-' + version)
+                            package_path = os.path.join(plugin_directory, package + '-' + version[:-4])
                             if os.path.exists(package_path):
                                 print('Package: ' + package + ' ' + version + ' already installed')
 
@@ -223,7 +231,7 @@ class InstallCommand(Command):
                     sys.exit(1)
 
                 # Package path construction
-                plugin_directory= os.path.join(self.dir, self.folder, self.name)
+                plugin_directory= os.path.join(self.dir, self.folder)
                 
                 # Create folder if installing in cwd
                 if os.environ != ["LIVEKEYS_DIR"]:
@@ -258,7 +266,7 @@ class InstallCommand(Command):
                 update_progress("Installing " + self.name, 1)
 
                 # install main packages
-                package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version']  )
+                package_path = os.path.join(plugin_directory, self.name + '-' + jsonResponse['version'][:-4])
                 open( package_path + '.zip', 'wb').write(getZip.content)
 
                 # unzip main package and remove zip file
