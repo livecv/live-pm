@@ -23,7 +23,7 @@ A minimal package file would contain the following fileds:
 
 ## Additional Info
 
-Additional info on Live CV packages and package files is available [here](http://livecv.dinusv.com/documentation/dev-deployment-scripts.html)
+Additional info on Live CV packages and package files is available [here](http://livekeys.dinusv.com/documentation/dev-deployment-scripts.html)
 
 
 

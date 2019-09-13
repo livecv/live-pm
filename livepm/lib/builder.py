@@ -12,9 +12,9 @@ class Builder:
         self.packagefile = Configuration.findpackage(packagepath)
         self.releaseid = releaseid
         self.solve_dependencies = True
-        self.deploy_to_livecv = True
-        self.livecv_bin_path = None
-        self.livecv_dev_path = None
+        self.deploy_to_livekeys = True
+        self.livekeys_bin_path = None
+        self.livekeys_dev_path = None
         self.dependencies = {}
 
         print('\nParsing build file \'' + self.packagefile + '\'...')
@@ -93,19 +93,19 @@ class Builder:
                 b = Builder(dependency_source, self.releaseid)
                 b.solve_dependencies = False
 
-                if self.livecv_bin_path:
-                    value.options.append("LIVECV_BIN_PATH=\'" + self.livecv_bin_path + "\'")
-                if self.livecv_dev_path:
-                    value.options.append("LIVECV_DEV_PATH=\'" + self.livecv_dev_path + "\'")
+                if self.livekeys_bin_path:
+                    value.options.append("LIVEKEYS_BIN_PATH=\'" + self.livekeys_bin_path + "\'")
+                if self.livekeys_dev_path:
+                    value.options.append("LIVEKEYS_DEV_PATH=\'" + self.livekeys_dev_path + "\'")
 
                 b.releasedir = dependency_release
                 b(dependency_source, dependency_release, options)
 
-                if dependency_build == 'livecv':
-                    self.livecv_bin_path = os.path.join(dependency_release, "bin")
+                if dependency_build == 'livekeys':
+                    self.livekeys_bin_path = os.path.join(dependency_release, "bin")
                     if sys.platform.lower() == 'darwin':
-                        self.livecv_bin_path = os.path.join(self.livecv_bin_path, "livecv.app", "Contents")
-                    self.livecv_dev_path = dependency_source
+                        self.livekeys_bin_path = os.path.join(self.livekeys_bin_path, "livekeys.app", "Contents")
+                    self.livekeys_dev_path = dependency_source
 
         print('\nCreating config file:')
 
@@ -113,14 +113,14 @@ class Builder:
             os.rename(sourcedir + '/config.pri', sourcedir + '/config.pri.bak')
 
         options = ["BUILD_DEPENDENCIES=false"]
-        if self.livecv_bin_path:
-            options.append("LIVECV_BIN_PATH=\'" + self.livecv_bin_path + "\'")
-        if self.livecv_dev_path:
-            options.append("LIVECV_DEV_PATH=\'" + self.livecv_dev_path + "\'")
-        if self.deploy_to_livecv:
-            options.append("DEPLOY_TO_LIVECV=true")
+        if self.livekeys_bin_path:
+            options.append("LIVEKEYS_BIN_PATH=\'" + self.livekeys_bin_path + "\'")
+        if self.livekeys_dev_path:
+            options.append("LIVEKEYS_DEV_PATH=\'" + self.livekeys_dev_path + "\'")
+        if self.deploy_to_livekeys:
+            options.append("DEPLOY_TO_LIVEKEYS=true")
         else:
-            options.append("DEPLOY_TO_LIVECV=false")
+            options.append("DEPLOY_TO_LIVEKEYS=false")
 
         writedata = ''
         for t in options:
