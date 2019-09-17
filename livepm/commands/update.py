@@ -85,23 +85,23 @@ class UpdateCommand(Command):
 
                 package = {packageName:version}
                 
-                # Check if the live.packages.json exist
-                if os.path.exists(os.path.join(plugin_directory, 'live.packages.json')):
+                # Check if the live.package.json exist
+                if os.path.exists(os.path.join(plugin_directory, 'live.package.json')):
                     
                     # Read from file if exists
-                    with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
+                    with open(os.path.join(plugin_directory,"live.package.json")) as livePackages:
                         data = json.load(livePackages)
                         current = data['dependencies']
                         current.update(package)
 
                         # Write updated data
-                        with open(os.path.join(plugin_directory,"live.packages.json"), "w") as livePackages:
+                        with open(os.path.join(plugin_directory,"live.package.json"), "w") as livePackages:
                             
                             json.dump(data, livePackages,ensure_ascii=False, indent=4)
                             
                 else:
-                    # Create live.packages.json and write default data
-                    with open(os.path.join(plugin_directory,"live.packages.json"), 'w') as livePackages:
+                    # Create live.package.json and write default data
+                    with open(os.path.join(plugin_directory,"live.package.json"), 'w') as livePackages:
                         
                         package_details = {
                             
@@ -125,9 +125,9 @@ class UpdateCommand(Command):
         # Update packages from json.packages.json
         if not self.name:
 
-            if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
+            if os.path.exists(os.path.join(os.getcwd(), 'live.package.json')):
                 # read json
-                with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                     data = json.load(livePackages)
 
                     for package, version in data['dependencies'].items():
@@ -181,15 +181,15 @@ class UpdateCommand(Command):
                             zip.close()
                             os.remove(package_path + '.zip')
 
-                            # Read live.packages.json
-                            with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                            # Read live.package.json
+                            with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                                 data = json.load(livePackages)
                                 current = data['dependencies']
-                                # add new version to live.packages.json
+                                # add new version to live.package.json
                                 current.update({package:resp['version']})
 
                             # Write updated data
-                            with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
+                            with open(os.path.join(os.getcwd(),"live.package.json"), "w") as livePackages:
                                     
                                 json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
@@ -199,10 +199,10 @@ class UpdateCommand(Command):
                         else:
                             print('Package ' + package + ' not found.')
 
-            # live.packages.json missing
+            # live.package.json missing
             else:
 
-                print('live.packages.json not found.')
+                print('live.package.json not found.')
                 sys.exit(1)
         else:
                     
@@ -215,11 +215,10 @@ class UpdateCommand(Command):
             # Package path construction
             plugin_directory= os.path.join(self.dir, self.folder, self.name)
 
-            with open(os.path.join(plugin_directory,"live.packages.json")) as livePackages:
+            with open(os.path.join(plugin_directory,"live.package.json")) as livePackages:
                 data = json.load(livePackages)
                 jsonResponse = json.loads(r.text)
                 # check if latest version is installed
-                # this does not work because in package is missing version in json
                 if data['version'] == jsonResponse['version']:
                     print(self.name + " up to date.")
 
@@ -251,25 +250,25 @@ class UpdateCommand(Command):
                         zip.extractall(package_path)
                         zip.close()
                         os.remove(package_path + '.zip')
-                        # Create live.packages.json for project
+                        # Create live.package.json for project
                         self.current_version = jsonResponse['version']
                         package = {self.name:jsonResponse['version']}
-                        if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
+                        if os.path.exists(os.path.join(os.getcwd(), 'live.package.json')):
                                 
-                            # Read live.packages.json
-                            with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                            # Read live.package.json
+                            with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                                 data = json.load(livePackages)
                                 current = data['dependencies']
                                 current.update(package)
 
                             # Write updated data
-                            with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
+                            with open(os.path.join(os.getcwd(),"live.package.json"), "w") as livePackages:
                                     
                                 json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
                         else:
-                            # Create live.packages.json and write default data
-                            with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
+                            # Create live.package.json and write default data
+                            with open(os.path.join(os.getcwd(),"live.package.json"), 'w') as livePackages:
                                 package_details = {
                                         
                                     "name": os.path.basename(os.getcwd()), 

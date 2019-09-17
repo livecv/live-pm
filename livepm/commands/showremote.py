@@ -14,9 +14,9 @@ from livepm.lib.configuration import Configuration
 
 server_url = "https://livekeys.io/api/"
 
-class ShowRemoteCommand(Command):
+class RemoteShowCommand(Command):
 
-    name = 'show-remote'
+    name = 'remote-show'
     description = 'Show information about the package that is not installed.'
 
     def __init__(self):
@@ -47,20 +47,36 @@ class ShowRemoteCommand(Command):
 
             self.release = 'win'
 
+
     def __call__(self):
         
         # Construct url
         urlParams = 'package/' + self.name + '/' + 'latest/' + self.release
         url = urllib.parse.urljoin(self.server_url, urlParams)
-        # Send request
-        r = re.get(url, allow_redirects=True)
 
-        jsonResponse = json.loads(r.text)
+        # Check url and send request
+        try:
 
-        print(self.name + ' version ' + jsonResponse['version'][:-4], '\n')
-        print('Dependencies:', '\n')
+            r = re.get(url, allow_redirects=True)
+            jsonResponse = json.loads(r.text)
+
+        # throw an error if url is not valid
+        except:
+
+            print('Invalid url.')
+            sys.exit(1)
+
+        try:
+
+            print(self.name + ' version: ' + jsonResponse['version'][:-4], '\n')
+            print('Dependencies:', '\n')
             
-        for package in jsonResponse['dependencies']:
+            for package in jsonResponse['dependencies']:
 
-            print('\t','*',package['package']['name'], 'version ', package['version'][:-4])
+                print('\t','*',package['package']['name'], 'version ', package['version'][:-4])
 
+        # throw an error if version is not found.           
+        except:
+
+            print(self.name + ' not found.')
+            sys.exit(1)

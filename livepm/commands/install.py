@@ -33,7 +33,7 @@ class InstallCommand(Command):
         self.release   = ''
         self.server_url   = args.server_url
         self.current_version = ''
-  
+        
         # Directory construction
         if args.install_globally:
             
@@ -66,9 +66,11 @@ class InstallCommand(Command):
 
         # Check url here
         try:
+
             r = re.get(self.server_url)
-            
+
         except:
+            
             print('Invalid url.')
             sys.exit(1)
 
@@ -93,24 +95,24 @@ class InstallCommand(Command):
                 dependencyUrl = i['url']
                 dependencyPath = os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), packageName + '-' + version[:-4])
 
-                package = {packageName:version[:-4]}
+                package = {packageName:version}
                 
-                if os.path.exists(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json')):
+                if os.path.exists(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.package.json')):
                     
                     # Read from file if exists
-                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json')) as livePackages:
+                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.package.json')) as livePackages:
                         data = json.load(livePackages)
                         current = data['dependencies']
                         current.update(package)
 
                         # Write updated data
-                        with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.packages.json'), "w") as livePackages:
+                        with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.package.json'), "w") as livePackages:
                             
                             json.dump(data, livePackages,ensure_ascii=False, indent=4)
                             
                 else:
-                    # Create live.packages.json and write default data
-                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]),"live.packages.json"), 'w') as livePackages:
+                    # Create live.package.json and write default data
+                    with open(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]),"live.package.json"), 'w') as livePackages:
                         
                         package_details = {
                             
@@ -133,9 +135,9 @@ class InstallCommand(Command):
         # Install from json list here
         if not self.name:
 
-            if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
+            if os.path.exists(os.path.join(os.getcwd(), 'live.package.json')):
                 # read json
-                with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                     data = json.load(livePackages)
                 
                     for package, version in data['dependencies'].items():
@@ -170,12 +172,14 @@ class InstallCommand(Command):
                             plugin_directory= os.path.join(self.dir, self.folder)
 
                             if not os.path.exists(plugin_directory):
+                                
                                 os.makedirs(plugin_directory)
 
                             else:
                                 pass
 
                             package_path = os.path.join(plugin_directory, package + '-' + version[:-4])
+                            
                             if os.path.exists(package_path):
                                 print('Package: ' + package + ' ' + version + ' already installed')
 
@@ -197,19 +201,19 @@ class InstallCommand(Command):
                                 for i in resp['dependencies']:
                                     progressBarLen = i['dependencies']
 
-                                for i in range(len(progressBarLen)):
-                                    update_progress("installing dependencies:", i/len(progressBarLen))
-                                # # Finished
-                                update_progress("Installing dependencies:" , 1)
+                                    for i in range(len(progressBarLen)):
+                                        update_progress("installing dependencies:", i/len(progressBarLen))
+                                    # # Finished
+                                    update_progress("Installing dependencies:" , 1)
                             
                         # Note if the package is not found
                         else:
                             print('Package ' + package + ' not found.')
 
-            # live.packages.json missing
+            # live.package.json missing
             else:
 
-                print('live.packages.json not found.')
+                print('live.package.json not found.')
                 sys.exit(1)
         else:
 
@@ -217,8 +221,7 @@ class InstallCommand(Command):
             urlParams = 'package/' + self.name + '/' + 'latest/' + self.release
             url = urllib.parse.urljoin(self.server_url, urlParams)
             # Send request
-            r = re.get(url, allow_redirects=True)
-                        
+            r = re.get(url, allow_redirects=True)            
             # Check the url
             if r.ok:
 
@@ -238,7 +241,7 @@ class InstallCommand(Command):
 
                     # Check if the package is installed
                     try:
-                        os.makedirs(plugin_directory)
+                        os.makedirs(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]))
 
                     except:
                         print('Package ' + self.name + ' already installed.')
@@ -275,25 +278,25 @@ class InstallCommand(Command):
                 zip.extractall(package_path)
                 zip.close()
                 os.remove(package_path + '.zip')
-                # Create live.packages.json for project
+                # Create live.package.json for project
                 self.current_version = jsonResponse['version']
                 package = {self.name:self.current_version}
-                if os.path.exists(os.path.join(os.getcwd(), 'live.packages.json')):
+                if os.path.exists(os.path.join(os.getcwd(), 'live.package.json')):
                     
-                    # Read live.packages.json
-                    with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                    # Read live.package.json
+                    with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                         data = json.load(livePackages)
                         current = data['dependencies']
                         current.update(package)
 
                     # Write updated data
-                    with open(os.path.join(os.getcwd(),"live.packages.json"), "w") as livePackages:
+                    with open(os.path.join(os.getcwd(),"live.package.json"), "w") as livePackages:
                         
                         json.dump(data, livePackages,ensure_ascii=False, indent=4)
 
                 else:
-                    # Create live.packages.json and write default data
-                    with open(os.path.join(os.getcwd(),"live.packages.json"), 'w') as livePackages:
+                    # Create live.package.json and write default data
+                    with open(os.path.join(os.getcwd(),"live.package.json"), 'w') as livePackages:
                         package_details = {
                             
                             "name": os.path.basename(os.getcwd()), 
@@ -306,12 +309,13 @@ class InstallCommand(Command):
                 downloadDependencies(versions)
 
                 for i in jsonResponse['dependencies']:
+                    
                     progressBarLen = i['dependencies']
 
-                for i in range(len(progressBarLen)):
-                    update_progress("installing dependencies for " + self.name, i/len(progressBarLen))
-                # # Finished
-                update_progress("Installing dependencies for " + self.name, 1)
+                    for i in range(len(progressBarLen)):
+                        update_progress("installing dependencies for " + self.name, i/len(progressBarLen))
+                    # # Finished
+                    update_progress("Installing dependencies for " + self.name, 1)
 
                 # remove package.lock
                 os.remove(os.path.join(os.getcwd(), 'live.package.lock'))

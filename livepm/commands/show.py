@@ -54,25 +54,25 @@ class ShowCommand(Command):
             for i in os.listdir(localDir):
 
                 path = os.path.join(localDir, i)
-                with open(os.path.join(path,"live.packages.json")) as livePackages:
+                with open(os.path.join(path,"live.package.json")) as livePackages:
                     data = json.load(livePackages)
                 print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
 
         except:
-            pass
+            
 
-        try:
+                try:
 
-            for i in os.listdir(lkeysDir):
-                            
-                path = os.path.join(lkeysDir, i)
-                with open(os.path.join(path,"live.packages.json")) as livePackages:
-                    data = json.load(livePackages)
-                print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
+                    for i in os.listdir(lkeysDir):
+                                    
+                        path = os.path.join(lkeysDir, i)
+                        with open(os.path.join(path,"live.package.json")) as livePackages:
+                            data = json.load(livePackages)
+                        print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
 
-        except:
+                except:
 
-            sys.exit()
+                    sys.exit()
 
                         
 
