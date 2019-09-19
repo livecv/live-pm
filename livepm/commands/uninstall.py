@@ -76,14 +76,14 @@ class UninstallCommand(Command):
                     shutil.rmtree(os.path.join(directory, package))
                     
                     # Remove package from live.package.json
-                    if os.path.exists(os.path.join(os.getcwd(), "live.packages.json")):
+                    if os.path.exists(os.path.join(os.getcwd(), "live.package.json")):
                         
-                        with open(os.path.join(os.getcwd(),"live.packages.json")) as livePackages:
+                        with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
                             data = json.load(livePackages)
 
                             data['dependencies'].pop(self.name)
 
-                        with open(os.path.join(os.getcwd(),"live.packages.json"),'w') as livePackages:
+                        with open(os.path.join(os.getcwd(),"live.package.json"),'w') as livePackages:
                             json.dump(data, livePackages, ensure_ascii=False, indent=4)
 
                     print('>> Package removed: ' + package)

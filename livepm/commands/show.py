@@ -48,31 +48,41 @@ class ShowCommand(Command):
             
             print('Local packages not found.')
             sys.exit(1)
-
+        
         try:
-
-            for i in os.listdir(localDir):
-
-                path = os.path.join(localDir, i)
-                with open(os.path.join(path,"live.package.json")) as livePackages:
-                    data = json.load(livePackages)
-                print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
-
-        except:
             
+            for package in os.listdir(lkeysDir):
 
-                try:
+                if package.startswith(self.name):
+  
+                    path = os.path.join(lkeysDir, package)
+                    package_path = os.path.join(path, "live.package.json")
 
-                    for i in os.listdir(lkeysDir):
-                                    
-                        path = os.path.join(lkeysDir, i)
+                    if ( os.path.exists(package_path) ):
                         with open(os.path.join(path,"live.package.json")) as livePackages:
                             data = json.load(livePackages)
-                        print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
+                            print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
+        except:
 
-                except:
+            pass
+        
+        try:
+            
+            for package in os.listdir(localDir):
 
-                    sys.exit()
+                if package.startswith(self.name):
+                
+                    path = os.path.join(localDir, package)
+                    package_path = os.path.join(path, "live.package.json")
+
+                    if ( os.path.exists(package_path) ):
+                        with open(os.path.join(path,"live.package.json")) as livePackages:
+                            data = json.load(livePackages)
+                            print('>> ' + data['name'] + ' version: ' + data['version'] + ' in ' + path)
+
+        except:
+
+            sys.exit()
 
                         
 

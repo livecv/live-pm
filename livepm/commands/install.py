@@ -93,8 +93,7 @@ class InstallCommand(Command):
                 version = i['version']
                 packageName = i['package']['name']
                 dependencyUrl = i['url']
-                dependencyPath = os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), packageName + '-' + version[:-4])
-
+                dependencyPath = os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), packageName + '-' + version[:-4])                
                 package = {packageName:version}
                 
                 if os.path.exists(os.path.join(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]), 'live.package.json')):
@@ -145,6 +144,7 @@ class InstallCommand(Command):
                         urlParams = 'package/' + package + '/release/' + version + '/' + self.release
                         url = urllib.parse.urljoin(self.server_url, urlParams)
                         r = re.get(url, allow_redirects=True)
+                        self.name = package
 
                         if r.ok:
 
@@ -198,6 +198,7 @@ class InstallCommand(Command):
                                 package = {self.name:self.current_version}
 
                                 downloadDependencies(dependencies)
+
                                 for i in resp['dependencies']:
                                     progressBarLen = i['dependencies']
 
@@ -224,6 +225,9 @@ class InstallCommand(Command):
             r = re.get(url, allow_redirects=True)            
             # Check the url
             if r.ok:
+                
+                # change var names
+                resp = json.loads(r.text)
 
                 # Check if the package.lock exist and create one if not
                 if not os.path.exists(os.path.join(os.getcwd(), 'live.package.lock')):
@@ -241,7 +245,7 @@ class InstallCommand(Command):
 
                     # Check if the package is installed
                     try:
-                        os.makedirs(os.path.join(plugin_directory, self.name + '-' + self.current_version[:-4]))
+                        os.makedirs(os.path.join(plugin_directory, self.name + '-' + resp['version'][:-4]))
 
                     except:
                         print('Package ' + self.name + ' already installed.')
