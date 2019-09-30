@@ -211,10 +211,9 @@ class UpdateCommand(Command):
             url = urllib.parse.urljoin(self.server_url, urlParams)
             # Send request
             r = re.get(url, allow_redirects=True)
-
+            resp = json.loads(r.text)
             # Package path construction
-            plugin_directory= os.path.join(self.dir, self.folder, self.name)
-
+            plugin_directory= os.path.join(self.dir, self.folder, self.name + '-' + resp['version'][:-4] )
             with open(os.path.join(plugin_directory,"live.package.json")) as livePackages:
                 data = json.load(livePackages)
                 jsonResponse = json.loads(r.text)
@@ -222,8 +221,33 @@ class UpdateCommand(Command):
                 if data['version'] == jsonResponse['version']:
                     print(self.name + " up to date.")
 
-                else:         
-                    # Check the url
+                else:
+
+                    if os.path.exists(os.path.join(os.getcwd(), 'live.package.json')):
+                        # read json
+                        with open(os.path.join(os.getcwd(),"live.package.json")) as livePackages:
+                            data = json.load(livePackages)
+
+                            for package, version in data['dependencies'].items():
+                                # urlParams = 'package/' + package + '/release/' + version + '/' + release
+                                urlParams = 'package/' + package + '/' + 'latest/' + release
+                                url = urllib.parse.urljoin(self.server_url, urlParams)
+                                r = re.get(url, allow_redirects=True)
+                                resp = json.loads(r.text)
+
+                                currentPackage = package + '-' + version
+                                latestPackage = package + '-' + resp['version']
+
+                                # Compare installed and newest version
+                                if currentPackage == latestPackage:
+                                    
+                                    print('Package: ' + package + ' ' + version + ' is up to date.')
+                                    sys.exit(1)
+
+                                else:
+                                    print('Updating '+ package)
+                                    pass         
+                            # Check the url
                     if r.ok:
 
                         # Check if the package.lock exist and create one if not
