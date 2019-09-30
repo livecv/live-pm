@@ -36,6 +36,9 @@ class SearchCommand(Command):
     def __call__(self):
         
         # Url construction
+        if not self.server_url.endswith('/'):
+            self.server_url += '/'
+
         urlParams = 'package?search=' + self.keyword
         url = urllib.parse.urljoin(self.server_url, urlParams)
         
@@ -45,32 +48,34 @@ class SearchCommand(Command):
         
         # Check if there is data for current search
         if jsonResponse['data']:
+
+            headers = [
+                
+                'Package name',
+                'Description',
+                'Date',
+                'Created by'
+
+                ]
+
+            data = []
                 
             for item in jsonResponse['data']:
-                
-                headers = [
-                    
-                    'Package name',
-                    'Description',
-                    'Date',
-                    'Created by'
 
-                    ]
-
-                data = [
+                data.append(
 
                     [
 
                     item['name'],
                     item['description'],
                     item['createdAt'],
-                    item['user']['username']
+                    item['user']['username'] if 'user' in item else ''
                         
                     ]
-                ]
+                )
 
-                table = columnar(data, headers, no_borders=True)
-                print(table)
+            table = columnar(data, headers, no_borders=True)
+            print(table)
 
         else:
 

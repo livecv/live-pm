@@ -109,18 +109,24 @@ class DependenciesCommand(Command):
             sys.exit(1)
 
         dependencies = jsonResponse['dependencies']
+        if len(dependencies) == 0:
+            print('Package ' + self.name + ' has no dependencies.')
+            sys.exit(1)
+
+        headers = [
+                
+            'Package name',
+            'Version',
+            'Date'
+
+            ]
+
+        data = []
 
         for package in dependencies:
                 
-            headers = [
-                    
-                'Package name',
-                'Version',
-                'Date'
 
-                ]
-
-            data = [
+            data.append(
 
                 [
 
@@ -128,8 +134,7 @@ class DependenciesCommand(Command):
                 package['version'],
                 package['createdAt']
           
-                ]
-            ]
+                ])
 
             table = columnar(data, headers, no_borders=True)
             print(table)

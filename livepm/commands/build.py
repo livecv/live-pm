@@ -21,7 +21,7 @@ class BuildCommand(Command):
         parser.add_argument('--source', '-s', default=None, help='Path to source directory.')
         parser.add_argument('--options', '-o', default=None, help='Specific build options')
         parser.add_argument('--build', '-b', default='', help='Custom build directory. Default directory is build.')
-        parser.add_argument('package_path', default='', help="Path to a livecv package or package file.")
+        parser.add_argument('package_path', default='', help="Path to a livekeys package or package file.")
         parser.add_argument('release_id', default='', help="Id of release.")
 
         args = parser.parse_args(argv)
@@ -36,5 +36,5 @@ class BuildCommand(Command):
 
     def __call__(self):
         b = Builder(self.package_file, self.release_id)
-        b.deploy_to_livecv = False
+        b.deploy_to_livekeys = False
         b(self.source_dir, os.path.join(self.build_dir, b.release.compiler), self.options)

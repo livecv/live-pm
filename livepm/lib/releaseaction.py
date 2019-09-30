@@ -14,7 +14,7 @@ class ReleaseAction:
             deploydir = os.path.abspath(releasedir + '/../' + self.parent.release_name())
             deploydirroot = os.path.join(deploydir, self.parent.dir_name()) + '/'
 
-            if self.parent.dir_name() == 'livecv' and sys.platform.lower() == 'darwin':
+            if self.parent.dir_name() == 'livekeys' and sys.platform.lower() == 'darwin':
                 deploydirroot = deploydir + '/'
 
             return deploydirroot

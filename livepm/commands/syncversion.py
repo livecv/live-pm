@@ -17,7 +17,7 @@ class SyncVersionCommand:
     def parse_args(self, argv):
         parser = argparse.ArgumentParser(description=SyncVersionCommand.description)
         parser.add_argument('--source', '-s', default=None, help='Path to source directory')
-        parser.add_argument('package_path', default='', help='Path to a livecv package or package file.')
+        parser.add_argument('package_path', default='', help='Path to a live package or package file.')
 
         args = parser.parse_args(argv)
 

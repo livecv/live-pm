@@ -187,7 +187,7 @@ class NewCommand(Command):
 
         qmake_subdir = 'SUBDIRS += ' + ('_'.join(self.plugin_segments)) + '\n' + '_'.join(self.plugin_segments) + '.subdir = ' + '/'.join(self.plugin_segments)
         qdata = qdata.replace('TEMPLATE = subdirs', 'TEMPLATE = subdirs\n' + qmake_subdir)
-        qdata = qdata.replace('livecv.subdir = $$PWD/livecv', 'livecv.subdir = $$PWD/livecv\n    ' + '_'.join(self.plugin_segments) + '.depends = livecv')
+        qdata = qdata.replace('livekeys.subdir = $$PWD/livekeys', 'livekeys.subdir = $$PWD/livekeys\n    ' + '_'.join(self.plugin_segments) + '.depends = livekeys')
 
         qf.seek(0)
         qf.write(qdata)

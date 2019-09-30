@@ -20,7 +20,7 @@ class DeployCommand(Command):
         parser.add_argument('--source', '-s', default=None, help='Path to source directory or package file.')
         parser.add_argument('--options', '-o', default=None, help='Specific deploy options.')
         parser.add_argument('--build', '-b', default=None, help='Custom build directory. Default directory is build.')
-        parser.add_argument('package_path', default='', help="Path to a livecv package or package file.")
+        parser.add_argument('package_path', default='', help="Path to a livekeys package or package file.")
         parser.add_argument('release_id', default='', help="Id of release.")
 
         args = parser.parse_args(argv)
@@ -31,7 +31,7 @@ class DeployCommand(Command):
         self.build_dir    = args.build if args.build else self.source_dir + '/build'
 
         self.source_dir = os.path.abspath(self.source_dir)
-        # usage = 'Usage: livecv_deploypy [-b <self.build_dir>] <buildfile> <self.release_id>'
+        # usage = 'Usage: livekeys_deploypy [-b <self.build_dir>] <buildfile> <self.release_id>'
 
     def __call__(self):
 
@@ -71,7 +71,7 @@ class DeployCommand(Command):
         releasename = release.name.replace('.', '-')
 
         deploydirroot = deploydir + '/' + releasename + '/'
-        if releasename == 'livecv' and sys.platform.lower() == 'darwin':
+        if releasename == 'livekeys' and sys.platform.lower() == 'darwin':
             deploydirroot = deploydir + '/'
 
         print('\nCleaning deploy dir: \'' + deploydir + '\'')
@@ -97,12 +97,25 @@ class DeployCommand(Command):
                     print(' * Removed:' + filepath)
 
         print('\nCreating archive...')
+        archive_name = ''
+        archive_root_dir = ''
+        archive_extension = ''
+
         if ( sys.platform.lower().startswith("win") ):
-            shutil.make_archive(deploydirroot + '/..', "zip", deploydir)
-            print(' * Generated: ' + buildname + '.zip')
+            archive_name = deploydirroot + '/..'
+            archive_root_dir = deploydir
+            archive_extension = "zip"
         elif sys.platform.lower() == 'darwin':
-            shutil.make_archive(deploydirroot, "gztar", deploydirroot)
-            print(' * Generated: ' + buildname + '.tar.gz')
+            archive_name = deploydirroot
+            archive_root_dir = deploydirroot
+            archive_extension = "gztar"
         else:
-            shutil.make_archive(deploydir, "gztar", deploydir)
-            print(' * Generated: ' + buildname + '.tar.gz')
+            archive_name = deploydir
+            archive_root_dir = deploydir
+            archive_extension = "gztar"
+
+        print(" * Archive Name: " + archive_name + "[" + archive_extension + "]")
+        print(" * Archive Root dir: " + archive_root_dir)
+        shutil.make_archive(archive_name, archive_extension, archive_root_dir)
+
+        print("Done")
