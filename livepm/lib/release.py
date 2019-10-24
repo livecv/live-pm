@@ -103,6 +103,7 @@ class Release:
         self.environmentopt = opt['environment']
         self.buildopt = opt['build']
         self.deployopt = opt['deploy']
+        self.document = opt['document'] if 'document' in opt else None
         self.environment = {}
 
         self.buildsteps = []

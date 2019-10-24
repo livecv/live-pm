@@ -7,6 +7,7 @@ import argparse
 
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration
+from livepm.lib.process import *
 
 class DeployCommand(Command):
     name = 'deploy'
@@ -90,7 +91,13 @@ class DeployCommand(Command):
             value(self.source_dir, releasedir, os.environ)
 
         if ( self.makedoc ):
+            self.makedoc = os.path.abspath(self.makedoc)
+
             print('\n *** Creating documentation *** \n')
+            doc_outpath = os.path.join(deploydir, release.document) if release.document else os.path.join(deploydir, releasename, 'doc')
+            os.makedirs(doc_outpath)
+            proc = Process.run(['node'] + [self.makedoc] + ['--output-path', doc_outpath] + [self.source_dir], os.path.dirname(self.makedoc), os.environ)
+            Process.trace('LIVEDOC: ', proc, end='')
 
         print('\nRemoving junk...')
 
