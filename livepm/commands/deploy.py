@@ -20,6 +20,7 @@ class DeployCommand(Command):
         parser.add_argument('--source', '-s', default=None, help='Path to source directory or package file.')
         parser.add_argument('--options', '-o', default=None, help='Specific deploy options.')
         parser.add_argument('--build', '-b', default=None, help='Custom build directory. Default directory is build.')
+        parser.add_argument('--makedoc', default=None, help='Enable documentation generation.')
         parser.add_argument('package_path', default='', help="Path to a livekeys package or package file.")
         parser.add_argument('release_id', default='', help="Id of release.")
 
@@ -29,6 +30,7 @@ class DeployCommand(Command):
         self.release_id   = args.release_id
         self.source_dir   = args.source if args.source else os.path.dirname(self.package_file)
         self.build_dir    = args.build if args.build else self.source_dir + '/build'
+        self.makedoc      = args.makedoc if args.makedoc else None
 
         self.source_dir = os.path.abspath(self.source_dir)
         # usage = 'Usage: livekeys_deploypy [-b <self.build_dir>] <buildfile> <self.release_id>'
@@ -86,6 +88,9 @@ class DeployCommand(Command):
         for value in release.deploysteps:
             print('\n *** ' + str(value).upper() + ' *** \n')
             value(self.source_dir, releasedir, os.environ)
+
+        if ( self.makedoc ):
+            print('\n *** Creating documentation *** \n')
 
         print('\nRemoving junk...')
 
