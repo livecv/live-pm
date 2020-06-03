@@ -7,6 +7,7 @@ from livepm.lib.releasedylib import ReleaseDylibRelink, ReleaseDylibAddRPath
 from livepm.lib.releaseclean import ReleaseClean
 from livepm.lib.releasepopulate import ReleasePopulate
 from livepm.lib.releaselivedoc import ReleaseLiveDoc
+from livepm.lib.releaseqtenvsetup import ReleaseQtEnvSetup
 from livepm.lib.process import Process
 from livepm.lib.filesystem import FileSystem
 from livepm.lib.winvsenviron import *
@@ -62,8 +63,6 @@ class ReleaseCopy(ReleaseAction):
 
         structurepaths['source']  = sourcedir
         structurepaths['release'] = releasedir
-
-        print('COPY:' + releasedir)
 
         FileSystem.copyFileStructure(self.run_dir(releasedir), self.options, structurepaths)
 
@@ -148,7 +147,8 @@ class Release:
             'dylibaddrpath': ReleaseDylibAddRPath,
             'clean' : ReleaseClean,
             'populate' : ReleasePopulate,
-            'livedoc' : ReleaseLiveDoc
+            'livedoc' : ReleaseLiveDoc,
+            'qtenvsetup' : ReleaseQtEnvSetup
         }
         return actions[type](self, step, options)
 
