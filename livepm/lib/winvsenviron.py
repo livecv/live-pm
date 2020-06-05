@@ -25,7 +25,7 @@ class VSEnvironment:
         return old
 
     def setupenv(vsver, vsparam = ''):
-        cmd = r'cmd /s /c ""%VS{vsver}COMNTOOLS%/../../VC/vcvarsall.bat" {vsparam} & set"'.format(**locals())
+        cmd = r'cmd /s /c ""%VS{vsver}COMNTOOLS%/../../VC/Auxiliary/Build/vcvarsall.bat" {vsparam} & set"'.format(**locals())
         ret = subprocess.Popen(
         		cmd,
         		stdout=subprocess.PIPE,
