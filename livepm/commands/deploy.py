@@ -102,12 +102,15 @@ class DeployCommand(Command):
 
         print('\nRemoving junk...')
 
+        jl = ''
+
         for subdir, dirs, files in os.walk(deploydirroot):
             for file in files:
                 filepath = os.path.join(subdir, file)
                 if ( file == '.gitignore' ):
                     os.remove(filepath)
-                    print(' * Removed:' + filepath)
+                    jl += ' * Removed:' + filepath + '; '
+        print(jl)
 
         print('\nCreating archive...')
         archive_name = ''
