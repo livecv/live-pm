@@ -3,7 +3,7 @@ import platform
 
 from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.releasesolveincludes import ReleaseSolveIncludes
-from livepm.lib.releasedylib import ReleaseDylibRelink, ReleaseDylibAddRPath
+from livepm.lib.releasedylib import ReleaseDylibRelink, ReleaseDylibAddRPath, ReleaseDylibTransferDependencies
 from livepm.lib.releaseclean import ReleaseClean
 from livepm.lib.releasepopulate import ReleasePopulate
 from livepm.lib.releaselivedoc import ReleaseLiveDoc
@@ -145,6 +145,7 @@ class Release:
             'solveincludes': ReleaseSolveIncludes,
             'dylibrelink': ReleaseDylibRelink,
             'dylibaddrpath': ReleaseDylibAddRPath,
+            'dylibtransferdependencies' : ReleaseDylibTransferDependencies,
             'clean' : ReleaseClean,
             'populate' : ReleasePopulate,
             'livedoc' : ReleaseLiveDoc,

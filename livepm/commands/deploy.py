@@ -8,6 +8,7 @@ import argparse
 from livepm.lib.command import Command
 from livepm.lib.configuration import Configuration
 from livepm.lib.process import *
+from livepm.lib.filesystem import FileSystem
 
 class DeployCommand(Command):
     name = 'deploy'
@@ -121,6 +122,14 @@ class DeployCommand(Command):
             archive_name = deploydirroot
             archive_root_dir = deploydirroot
             archive_extension = "gztar"
+
+            if Process.exists('create-dmg'):
+                proc = Process.run(['create-dmg', 'livekeys.app'], deploydirroot)
+                Process.trace('CREATEDMG: ', proc, end='')
+                for index, appfile in enumerate(FileSystem.listEntries(os.path.join(deploydirroot, '*.dmg'))):
+                    appfile_name = os.path.basename(appfile)
+                    print('CREATEDMG File: ' + appfile_name)
+                    os.rename(appfile, os.path.join(deploydirroot, '..', appfile_name))
         else:
             archive_name = deploydir
             archive_root_dir = deploydir

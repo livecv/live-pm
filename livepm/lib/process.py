@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import os
+from shutil import which
 
 class Process:
 
@@ -19,6 +20,9 @@ class Process:
         while( line ):
             print(preffix + line, end=end)
             line = proc.stdout.readline()
+
+    def exists(name):
+        return which(name) is not None
 
     def scriptdir():
         return os.path.dirname(os.path.realpath(__file__))

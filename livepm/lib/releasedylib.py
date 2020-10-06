@@ -5,6 +5,7 @@ import fnmatch
 from livepm.lib.process import Process
 from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.filesystem import FileSystem
+from livepm.lib.dylib import DylibDependencyTransfer
 
 class ReleaseDylibAddRPath(ReleaseAction):
     
@@ -89,3 +90,24 @@ class ReleaseDylibRelink(ReleaseAction):
         
         if not line.strip().endswith(':') and line:
             collect.append(line.strip())
+
+
+class ReleaseDylibTransferDependencies(ReleaseAction):
+    
+    def __init__(self, parent, step, options = None):
+        super().__init__("dylibtransferdependencies", parent, step)
+        self.options = options
+
+    def __call__(self, sourcedir, releasedir, environment = os.environ):
+        structurepaths = {}
+        for key, value in self.parent.environment.items():
+            structurepaths[value] = environment[key]
+
+        deploydir = os.path.abspath(releasedir + '/../' + self.parent.release_name())
+
+        self.options['dependencies'] = self.options['dependencies'].format_map(structurepaths)
+        self.options['files']        = self.options['files'].format_map(structurepaths)
+        self.options['destination']  = os.path.join(deploydir, self.options['destination'].format_map(structurepaths))
+        
+        ldt = DylibDependencyTransfer(self.options)
+        ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
