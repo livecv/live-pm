@@ -18,6 +18,8 @@ class ReleaseDylibAddRPath(ReleaseAction):
             if not os.path.isabs(key):
                 key = os.path.join(self.run_dir(releasedir), key)
 
+            log = ''
+
             entries = FileSystem.listEntries(key)
             for entry in entries:
                 if not os.path.islink(entry):
@@ -27,7 +29,9 @@ class ReleaseDylibAddRPath(ReleaseAction):
                             self.run_dir(releasedir)
                         )
                         Process.trace('Dylib AddRPath: ', intproc)
-                        print("Dylib Added RPath: " + entry + " -> " + rpath)
+                        log += "Dylib Added RPath: " + entry + " -> " + rpath + '; '
+            
+            print(log)
 
 
 class ReleaseDylibRelink(ReleaseAction):
