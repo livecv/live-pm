@@ -30,11 +30,12 @@ class ReleaseSolveIncludesItem:
                     if ( sourcefile is not None ):
                         sourcefilepath = os.path.join(sourcepath, filename)
                         shutil.copyfile(sourcefilepath, os.path.join(absto, filename))
-                        print('Includes: Solved \'' + sourcefilepath + '\'')
+                        # print('Includes: Solved \'' + sourcefilepath + '\'')
                         filefound = True
                         break
                 if ( not filefound ):
                     print('Includes: Warning, no match found for \'' + filename + '\'')
+        print('Includes: Solved \'' + absinclude + '\'')
 
 
 class ReleaseSolveIncludes(ReleaseAction):
