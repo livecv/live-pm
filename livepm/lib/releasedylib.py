@@ -119,8 +119,8 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
 
         def dlyboutput(s):
             print('Dylib DT:' + s)
-            sleep(0.05)
-            print("SLEPT FOR 0.05")
+            sleep(0.01)
+            print("SLEPT FOR 0.01")
 
 
         # ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
