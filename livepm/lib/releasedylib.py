@@ -114,4 +114,5 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
         self.options['destination']  = os.path.join(deploydir, self.options['destination'].format_map(structurepaths))
         
         ldt = DylibDependencyTransfer(self.options)
-        ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
+        # ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
+        ldt.run(lambda s : s))
