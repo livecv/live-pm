@@ -82,22 +82,19 @@ class DylibLinkInfo:
         return dependency
 
     def add_rpath(self, path):
-        changeproc = Process.run(
+        Process.back_tick(
             ['install_name_tool', '-add_rpath', path, self.path], 
             os.getcwd()
         )
-        changeproc.wait()
         return True
 
     def change_dependency(self, old, new):
         for index, dep in enumerate(self.dependencies):
             if dep == old:
-                changeproc = Process.run(
+                Process.back_tick(
                     ['install_name_tool', '-change', dep, new, self.path], 
                     os.getcwd()
                 )
-                changeproc.wait()
-
                 self.dependencies[index] = new
                 return True
 
