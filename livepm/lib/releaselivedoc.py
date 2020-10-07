@@ -26,4 +26,6 @@ class ReleaseLiveDoc(ReleaseAction):
             return
 
         proc = Process.run(['node', os.environ['LIVEDOC'], '--deploy', deploy_to, os.path.abspath(sourcedir)], os.path.dirname(os.environ['LIVEDOC']), environment)
-        Process.trace('LIVEDOC: ', proc, end='')
+        proc.wait()
+        print("Livedoc ready.")
+        # Process.trace('LIVEDOC: ', proc, end='')

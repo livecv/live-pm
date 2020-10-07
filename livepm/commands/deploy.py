@@ -110,7 +110,7 @@ class DeployCommand(Command):
                 if ( file == '.gitignore' ):
                     os.remove(filepath)
                     jl += ' * Removed:' + filepath + '; '
-        print(jl)
+        # print(jl)
 
         print('\nCreating archive...')
         archive_name = ''
