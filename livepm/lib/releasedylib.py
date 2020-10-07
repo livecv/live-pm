@@ -116,12 +116,17 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
         self.options['destination']  = os.path.join(deploydir, self.options['destination'].format_map(structurepaths))
         
         ldt = DylibDependencyTransfer(self.options)
+
+        def dlyboutput(s):
+            print('Dylib DT:' + s)
+            sleep(0.05)
+            print("SLEPT FOR 0.05")
+
+
         # ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
-        # ldt.run(lambda s : s)
-        counter_test = 0
-        while ( counter_test < 2000 ):
-            print(counter_test)
-            sleep(0.01)
-            print("SLEPT FOR 0.01")
-            counter_test += 1
-        print("DEP TRANSFER NOT RUN")
+        ldt.run(dlyboutput)
+        # counter_test = 0
+        # while ( counter_test < 2000 ):
+        #     print(counter_test)
+        #     counter_test += 1
+        # print("DEP TRANSFER NOT RUN")
