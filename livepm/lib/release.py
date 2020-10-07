@@ -1,5 +1,6 @@
 import os
 import platform
+import time
 
 from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.releasesolveincludes import ReleaseSolveIncludes
@@ -21,8 +22,12 @@ class ReleaseMake(ReleaseAction):
         self.makecommand = 'make'
 
     def __call__(self, sourcedir, releasedir, environment = os.environ):
+        start = time.time()
         proc = Process.run([self.makecommand] + self.options, self.run_dir(releasedir), environment)
         Process.trace('MAKE: ', proc, end='')
+        end = time.time()
+
+        print('Make - Time Elapsed:' + str(end - start))
 
 class ReleaseNMake(ReleaseAction):
 
