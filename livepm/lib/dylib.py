@@ -103,6 +103,23 @@ class DylibLinkInfo:
 
         return False
 
+
+    def change_dependencies(self, structure):
+        args = ['install_name_tool', ]
+        for old, new in structure.items():
+            for index, dep in enumerate(self.dependencies):
+                if dep == old:
+                    args.append('-change')
+                    args.append(dep)
+                    args.append(new)
+                    self.dependencies[index] = new
+
+        args.append(self.path)
+        changeproc = Process.run(args, os.getcwd())
+        changeproc.wait()
+
+        return True
+
     # This sets the install name of the .dylib file itself and will be used as the prototype 
     # install name from that point forward when something links with the .dylib
     def change_id(self, old, new):
@@ -205,6 +222,8 @@ class DylibDependencyTransfer:
 
             total_deps = 0
 
+            dependency_change_structure = {}
+
             # Change dependencies
             for key, dep in enumerate(value['dependencies']):
                 # print('    Dep ' + str(dep)) # [id, path]
@@ -212,10 +231,13 @@ class DylibDependencyTransfer:
                 rel_dependency_path = self.library_map.hierarchy[dep[1]]['path_info']['path']
                 rel_from_here_path = copy_info['path_out'] + '/' + rel_dependency_path
 
-                linfo.change_dependency(dep[0], '@rpath/' + rel_from_here_path)
+                # linfo.change_dependency(dep[0], '@rpath/' + rel_from_here_path)
+                dependency_change_structure[dep[0]] = '@rpath/' + rel_from_here_path
                 # print('    Changed: ' + dep[0] + ' -> ' + '@rpath/' + rel_from_here_path)
 
                 total_deps += 1
+
+            linfo.change_dependencies(dependency_change_structure)
 
             print_call('    Changed ' + str(total_deps) + ' dependencies.')
             linfo.add_rpath('@loader_path')
