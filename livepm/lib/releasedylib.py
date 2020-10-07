@@ -2,6 +2,8 @@ import os
 import platform
 import fnmatch
 
+from time import sleep
+
 from livepm.lib.process import Process
 from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.filesystem import FileSystem
@@ -119,5 +121,7 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
         counter_test = 0
         while ( counter_test < 2000 ):
             print(counter_test)
+            sleep(0.01)
+            print("SLEPT FOR 0.01")
             counter_test += 1
         print("DEP TRANSFER NOT RUN")
