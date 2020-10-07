@@ -115,4 +115,5 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
         
         ldt = DylibDependencyTransfer(self.options)
         # ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
-        ldt.run(lambda s : s))
+        # ldt.run(lambda s : s)
+        print("DEP TRANSFER NOT RUN")
