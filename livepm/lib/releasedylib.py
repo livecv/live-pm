@@ -117,7 +117,7 @@ class ReleaseDylibTransferDependencies(ReleaseAction):
         # ldt.run(lambda s : print('Dylib Dependency Transfer: ' + s))
         # ldt.run(lambda s : s)
         counter_test = 0
-        while ( counter_test < 1000 )
+        while ( counter_test < 2000 ):
             print(counter_test)
             counter_test += 1
         print("DEP TRANSFER NOT RUN")
