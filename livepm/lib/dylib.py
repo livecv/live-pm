@@ -2,12 +2,296 @@ import os
 import platform
 import fnmatch
 import shutil
+import sys
+import stat
+import uuid
+import re
 
-from livepm.lib.process import Process
-from livepm.lib.filesystem import FileSystem
+from macholib.ptypes import sizeof
+from macholib.util import fsencoding
+from macholib import MachO
+from macholib import mach_o
+
+# A set of functions used from machotools
+#
+# Copyright (c) 2013, Enthought, Inc.
+# All rights reserved.
+#
+
+# Utilities
+# ---------------------------------------------------------------------------------------
+
+def macho_path_as_data(filename, pad_to=4):
+    """ Encode a path as data for a MachO header.
+    Namely, this will encode the text according to the filesystem
+    encoding and zero-pad the result out to 4 bytes.
+    Parameters
+    ----------
+    filename: str
+        Path string to encode
+    pad_to: int
+        Number of bytes to pad the encoded string to
+    """
+    filename = fsencoding(filename) + b'\x00'
+    rem = len(filename) % pad_to
+    if rem > 0:
+        filename += b'\x00' * (pad_to - rem)
+    return filename
+
+def rstrip_null_bytes(s):
+    """Right-strip any null bytes at the end of the given string."""
+    return s.rstrip(b'\x00')
+
+def convert_to_string(data):
+    data = rstrip_null_bytes(data)
+    return data.decode(sys.getfilesystemencoding())
+
+def safe_write(target, writer, mode="wt"):
+    """a 'safe' way to write to files.
+    Instead of writing directly into a file, this function writes to a
+    temporary file in the same directory, and then rename the file to the
+    target if no error occured.  On most platforms, rename is atomic, so this
+    avoids leaving stale files in inconsistent states.
+    Parameters
+    ----------
+    target: str
+        destination to write to
+    writer: callable or data
+        if callable, assumed to be function which takes one argument, a file
+        descriptor, and writes content to it. Otherwise, assumed to be data
+        to be directly written to target.
+    mode: str
+        opening mode
+    """
+    if not callable(writer):
+        data = writer
+        writer = lambda fp: fp.write(data)
+
+    file_mode = stat.S_IMODE(os.stat(target).st_mode)
+
+    tmp_target = "%s.tmp%s" % (target, uuid.uuid4().hex)
+    f = open(tmp_target, mode)
+    try:
+        writer(f)
+    finally:
+        f.close()
+    os.chmod(tmp_target, file_mode)
+    os.rename(tmp_target, target)
+
+def safe_update(target, writer, mode="wt"):
+    """a 'safe' way to update a file.
+    Instead of writing directly into a file, this function first copies target
+    to a temporary file and, writes to it, and then rename the file to the
+    target if no error occured.  On most platforms, rename is atomic, so this
+    avoids leaving stale files in inconsistent states.
+    Parameters
+    ----------
+    target: str
+        file to update
+    writer: callable or data
+        if callable, assumed to be function which takes one argument, a file
+        descriptor, and writes content to it. Otherwise, assumed to be data
+        to be directly written to target.
+    mode: str
+        opening mode
+    """
+    if 'b' in mode:
+        target_mode = 'rb'
+    else:
+        target_mode = 'r'
+
+    def writer_wrap(f):
+        g = open(target, target_mode)
+        try:
+            shutil.copyfileobj(g, f)
+        finally:
+            g.close()
+        return writer(f)
+    return safe_write(target, writer_wrap, mode)
+
+
+def _change_command_data_inplace(header, index, old_command, new_data):
+    # We change the command 'in-place' to ensure the new dylib command is as
+    # close as possible as the old one (same version, timestamp, etc...)
+    (old_load_command, old_dylib_command, old_data) = old_command
+
+    if header.header.magic in (mach_o.MH_MAGIC, mach_o.MH_CIGAM):
+        pad_to = 4
+    else:
+        pad_to = 8
+    data = macho_path_as_data(new_data, pad_to=pad_to)
+
+    cmdsize_diff = len(data) - len(old_data)
+    load_command = old_load_command
+    load_command.cmdsize += cmdsize_diff
+
+    dylib_command = old_dylib_command
+
+    header.commands[index] = (load_command, dylib_command, data)
+    header.changedHeaderSizeBy(cmdsize_diff)
+
+def _find_lc_dylib_command(header, command_type):
+    commands = []
+    for command_index, (load_command, dylib_command, data) in enumerate(header.commands):
+        if load_command.cmd == command_type:
+            commands.append((command_index, (load_command, dylib_command, data)))
+
+    return commands
+
+# Dependencies
+# -------------------------------------------------------------------------------
+
+def _find_specific_lc_load_dylib(header, dependency_pattern):
+    for index, (load_command, dylib_command, data) in \
+            _find_lc_dylib_command(header, mach_o.LC_LOAD_DYLIB):
+        m = dependency_pattern.search(convert_to_string(data))
+        if m:
+            return index, (load_command, dylib_command, data)
+
+def _change_dependency_command(header, old_dependency_pattern, new_dependency):
+    old_command = _find_specific_lc_load_dylib(header, old_dependency_pattern)
+    if old_command is None:
+        return
+    command_index, command_tuple = old_command
+    _change_command_data_inplace(header, command_index, command_tuple, new_dependency)
+
+def dependencies(filename):
+    """Returns the list of mach-o the given binary depends on.
+    Parameters
+    ----------
+    filename: str
+        Path to the mach-o to query
+    Returns
+    -------
+    dependency_names: seq
+        dependency_names[i] is the list of dependencies for the i-th header.
+    """
+    m = MachO.MachO(filename)
+    return _list_dependencies_macho(m)
+
+def _list_dependencies_macho(m):
+    ret = []
+
+    for header in m.headers:
+        this_ret = []
+        for load_command, dylib_command, data in header.commands:
+            if load_command.cmd == mach_o.LC_LOAD_DYLIB:
+                this_ret.append(convert_to_string(data))
+        ret.append(this_ret)
+    return ret
+
+def change_dependency(filename, old_dependency_pattern, new_dependency):
+    """Change the install name of a mach-o dylib file.
+    For a multi-arch binary, every header is overwritten to the same install
+    name
+    Parameters
+    ----------
+    filename: str
+        Path to the mach-o file to modify
+    new_install_name: str
+        New install name
+    """
+    _r_old_dependency = re.compile(old_dependency_pattern)
+    m = MachO.MachO(filename)
+    for header in m.headers:
+        _change_dependency_command(header, _r_old_dependency, new_dependency)
+
+    def writer(f):
+        for header in m.headers:
+            f.seek(0)
+            header.write(f)
+    safe_update(filename, writer, "wb")
+
+# RPaths
+# ---------------------------------------------------------------------------------------
+
+def list_rpaths(filename):
+    """Get the list of rpaths defined in the given mach-o binary.
+    The returned value is a list rpaths such as rpaths[i] is the list of rpath
+    in the i-th header.
+    Note
+    ----
+    The '\0' padding at the end of each rpath is stripped
+    Parameters
+    ----------
+    filename: str
+        The path to the mach-o binary file to look at
+    """
+    m = MachO.MachO(filename)
+    return _list_rpaths_macho(m)
+
+def _list_rpaths_macho(m):
+    rpaths = []
+
+    for header in m.headers:
+        header_rpaths = []
+        rpath_commands = [command for command in header.commands if
+                isinstance(command[1], mach_o.rpath_command)]
+        for rpath_command in rpath_commands:
+            rpath = rpath_command[2]
+            if not rpath.endswith(b"\x00"):
+                raise ValueError("Unexpected end character for rpath command value: %r".format(rpath))
+            else:
+                header_rpaths.append(convert_to_string(rpath))
+        rpaths.append(header_rpaths)
+
+    return rpaths
+
+def add_rpaths(filename, rpaths):
+    """Add the given list of path rpaths to all header in a MachO file.
+    Parameters
+    ----------
+    filename: str
+        The path to the macho-o binary file to add rpath to
+    rpaths: seq
+        List of paths to add as rpath to the mach-o binary
+    """
+    macho = MachO.MachO(filename)
+    for header in macho.headers:
+        for rpath in rpaths:
+            _add_rpath_to_header(header, rpath)
+
+    def writer(f):
+        for header in macho.headers:
+            f.seek(0)
+            header.write(f)
+    safe_update(filename, writer, "wb")
+
+def _add_rpath_to_header(header, rpath):
+    """Add an LC_RPATH load command to a MachOHeader.
+    Parameters
+    ----------
+    header: MachOHeader instances
+        A mach-o header to add rpath to
+    rpath: str
+        The rpath to add to the given header
+    """
+    if header.header.magic in (mach_o.MH_MAGIC, mach_o.MH_CIGAM):
+        pad_to = 4
+    else:
+        pad_to = 8
+    data = macho_path_as_data(rpath, pad_to=pad_to)
+    header_size = sizeof(mach_o.load_command) + sizeof(mach_o.rpath_command)
+
+    rem = (header_size + len(data)) % pad_to
+    if rem > 0:
+        data += b'\x00' * (pad_to - rem)
+
+    command_size = header_size + len(data)
+
+    cmd = mach_o.rpath_command(header_size, _endian_=header.endian)
+    lc = mach_o.load_command(mach_o.LC_RPATH, command_size,
+        _endian_=header.endian)
+    header.commands.append((lc, cmd, data))
+    header.header.ncmds += 1
+    header.changedHeaderSizeBy(command_size)
+
+
+# Library
+# ---------------------------------------------------------------------------------------
+
 
 class DylibLinkInfo:
-
     def __init__(self, path):
         self.path = path
         if ( not os.path.exists(path) ):
@@ -16,46 +300,21 @@ class DylibLinkInfo:
         self.dependencies = []
         self.rpath_info = []
 
-        proc = Process.run(['otool', '-L', self.path], os.getcwd())
+        m = MachO.MachO(path)
+        deps = _list_dependencies_macho(m)
+        if ( len(deps) > 0 ):
+            if ( type(deps[0]) is list ):
+                self.dependencies = [item for sublist in deps for item in sublist] # Flatten deps
+            else:
+                self.dependencies = deps
 
-        while proc.poll() is None:
-            line = proc.stdout.readline()
-            if line:
-                DylibLinkInfo.add_dependency_line(self.dependencies, line)
+        rpaths = _list_rpaths_macho(m)
+        if ( len(rpaths) > 0 ):
+            if ( type(rpaths[0]) is list ):
+                self.rpath_info = [item for sublist in rpaths for item in sublist] # Flatten rpaths
+            else:
+                self.rpath_info = rpaths
 
-        line = proc.stdout.readline()
-        while( line ):
-            DylibLinkInfo.add_dependency_line(self.dependencies, line)
-            line = proc.stdout.readline()
-
-        proc = Process.run(['otool', '-l', self.path], os.getcwd())
-
-        while proc.poll() is None:
-            line = proc.stdout.readline()
-            if line:
-                self.add_rpath_line(line)
-
-        line = proc.stdout.readline()
-        while( line ):
-            self.add_rpath_line(line)
-            line = proc.stdout.readline()
-
-    def add_rpath_line(self,line):
-        short = line.strip()
-        if short.startswith('path '):
-            index = short.find('(offset')
-            if index > 0:
-                self.rpath_info.append(short[5:index].strip())
-
-    def add_dependency_line(collect, line):
-        try:
-            idx = line.index('(')
-            line = line[:idx]
-        except ValueError:
-            pass
-        
-        if not line.strip().endswith(':') and line:
-            collect.append(line.strip())
 
     def find_dependencies(self, pattern):
         result = []
@@ -82,39 +341,21 @@ class DylibLinkInfo:
         return dependency
 
     def add_rpath(self, path):
-        Process.back_tick(
-            ['install_name_tool', '-add_rpath', path, self.path], 
-            os.getcwd()
-        )
+        add_rpaths(self.path, [path])
         return True
 
     def change_dependency(self, old, new):
         for index, dep in enumerate(self.dependencies):
             if dep == old:
-                Process.back_tick(
-                    ['install_name_tool', '-change', dep, new, self.path], 
-                    os.getcwd()
-                )
+                change_dependency(self.path, old, new)
                 self.dependencies[index] = new
                 return True
-
         return False
 
-
     def change_dependencies(self, structure):
-        args = ['install_name_tool', ]
+        print('Using non external dylib.')
         for old, new in structure.items():
-            for index, dep in enumerate(self.dependencies):
-                if dep == old:
-                    args.append('-change')
-                    args.append(dep)
-                    args.append(new)
-                    self.dependencies[index] = new
-
-        args.append(self.path)
-        changeproc = Process.run(args, os.getcwd())
-        changeproc.wait()
-
+            self.change_dependency(old, new)
         return True
 
     # This sets the install name of the .dylib file itself and will be used as the prototype 
@@ -132,109 +373,3 @@ class DylibLinkInfo:
                 return True
 
         return False
-        
-
-class DylibDependencyMap:
-
-    def __init__(self, filesToScan):
-
-        self.hierarchy = {}
-
-        for index, path in enumerate(filesToScan):
-            realpath = os.path.realpath(path)
-            if realpath not in self.hierarchy:
-                self.hierarchy[realpath] = { 'dependencies': [] }
-                self.recurse_dependencies(realpath)
-
-    def recurse_dependencies(self, path):
-        linfo = DylibLinkInfo(path)
-        deps = linfo.find_absolute_dependencies('/usr/local/*')
-        for i, dep in enumerate(deps):
-            full_dep = linfo.absolute_dependency(dep)
-            if full_dep != '':
-                real_dep = os.path.realpath(full_dep)
-                if real_dep != path:
-                    self.hierarchy[path]['dependencies'].append([dep, real_dep])
-                else:
-                    self.hierarchy[path]['self'] = [dep, real_dep]
-
-                if real_dep not in self.hierarchy:
-                    self.hierarchy[real_dep] = { 'dependencies': [] }
-                    self.recurse_dependencies(real_dep)
-
-    def tostring(self):
-        s = ''
-        for key, value in self.hierarchy.items():
-            s += key + '\n'
-            if 'self' in value:
-                s += '   Self ' + value['self'][0] + ' -> ' + value['self'][1] + '\n'
-            for i, dep in enumerate(value['dependencies']):
-                s += '   ' + dep[0]  + ' -> ' + dep[1] + '\n'
-
-        return s
-
-class DylibDependencyTransfer:
-
-    def __init__(self, options):
-        self.library_map = DylibDependencyMap(FileSystem.listEntries(options['files']))
-        self.custom_copy = options['custom']
-        self.copy_from = options['dependencies'] + '/'
-        self.copy_to = options['destination']
-
-        for key, value in self.library_map.hierarchy.items():
-            copy_info = {}
-
-            new_path = key.replace(self.copy_from, '')
-            last_slash = new_path.rfind('/')
-            if last_slash > 0:
-                lib_name = new_path[last_slash + 1:]
-
-                for custom_search, overwrite_path in self.custom_copy.items():
-                    if fnmatch.fnmatch(new_path, custom_search):
-                        last_slash = len(overwrite_path)
-                        new_path = overwrite_path + '/' + lib_name
-
-
-                copy_info['old_path'] = key
-                copy_info['path']     = new_path
-                copy_info['path_dir'] = new_path[0:last_slash]
-                copy_info['lib_name'] = lib_name
-                copy_info['path_out'] = '/'.join(map(lambda s: '..', copy_info['path_dir'].split('/'))) 
-
-                value['path_info'] = copy_info
-
-    def run(self, print_call):
-        for key, value in self.library_map.hierarchy.items():
-
-            copy_info = value['path_info']
-
-            if not os.path.exists(self.copy_to + '/' + copy_info['path_dir']):
-                os.makedirs(self.copy_to + '/' + copy_info['path_dir'])
-                print_call('Made dir: ' + self.copy_to + '/' + copy_info['path_dir'])
-
-            shutil.copyfile(key, self.copy_to + '/' + copy_info['path'])
-            print_call('Copied: ' + self.copy_to + '/' + copy_info['path'])
-
-            linfo = DylibLinkInfo(self.copy_to + '/' + copy_info['path'])
-
-            total_deps = 0
-
-            dependency_change_structure = {}
-
-            # Change dependencies
-            for key, dep in enumerate(value['dependencies']):
-                # print('    Dep ' + str(dep)) # [id, path]
-                # Find library
-                rel_dependency_path = self.library_map.hierarchy[dep[1]]['path_info']['path']
-                rel_from_here_path = copy_info['path_out'] + '/' + rel_dependency_path
-
-                # linfo.change_dependency(dep[0], '@rpath/' + rel_from_here_path)
-                dependency_change_structure[dep[0]] = '@rpath/' + rel_from_here_path
-                # print('    Changed: ' + dep[0] + ' -> ' + '@rpath/' + rel_from_here_path)
-
-                total_deps += 1
-
-            linfo.change_dependencies(dependency_change_structure)
-
-            print_call('    Changed ' + str(total_deps) + ' dependencies.')
-            linfo.add_rpath('@loader_path')

@@ -7,7 +7,7 @@ from time import sleep
 from livepm.lib.process import Process
 from livepm.lib.releaseaction import ReleaseAction
 from livepm.lib.filesystem import FileSystem
-from livepm.lib.dylib import DylibDependencyTransfer
+from livepm.lib.dylibdependencies import DylibDependencyTransfer
 
 class ReleaseDylibAddRPath(ReleaseAction):
     
