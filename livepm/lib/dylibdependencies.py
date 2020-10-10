@@ -6,10 +6,10 @@ import shutil
 from livepm.lib.process import Process
 from livepm.lib.filesystem import FileSystem
 from livepm.lib.dylibexternal import DylibLinkInfoExternal
-# from livepm.lib.dylib import DylibLinkInfo
+from livepm.lib.dylib import DylibLinkInfo
 
-DyLibUsed = DylibLinkInfoExternal
-# DyLibUsed = DylibLinkInfo
+# DyLibUsed = DylibLinkInfoExternal
+DyLibUsed = DylibLinkInfo
 
 class DylibDependencyMap:
 
